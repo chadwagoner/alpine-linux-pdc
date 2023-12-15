@@ -1,0 +1,7 @@
+#!/bin/bash
+
+### VARIABLES
+REPOSITORY_URL=https://raw.githubusercontent.com/chadwagoner/alpine-linux-pdc/main
+
+### UPDATE PDC TO CRON (/etc/periodic/hourly)
+curl -L -o /etc/periodic/hourly/pdc $REPOSITORY_URL/pdc
