@@ -1,6 +1,7 @@
 #!/bin/bash
 
 ### VARIABLES
+REPOSITORY_URL=https://raw.githubusercontent.com/chadwagoner/alpine-linux-pdc/main
 
 ### INSTALL REQUIRED BASE PACKAGES
 echo -e "INSTALLING BASE PACKAGES"
@@ -21,6 +22,9 @@ if [[ ! -f /root/.config/alpine-linux-pdc/config.yaml ]]; then
   echo -e ""
 fi
 
-### ADD PDC TO CRONTAB HOURLY
+### ADD OS-UPDATER TO CRON (/etc/periodic/monthly)
+curl -L -o /etc/periodic/monthly/os-updater $REPOSITORY_URL/os-updater
 
-### ADD PDC-UPDATER TO CRONTAB EVERY 15M
+### ADD PDC TO CRON (/etc/periodic/hourly)
+
+### ADD PDC-UPDATER TO CRON (15min)
