@@ -1,0 +1,4 @@
+#!/bin/bash
+
+### UPDATE PACKAGES/OS
+apk upgrade -U
