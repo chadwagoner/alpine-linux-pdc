@@ -29,3 +29,4 @@ curl -L -o /etc/periodic/monthly/os-updater $REPOSITORY_URL/os-updater
 curl -L -o /etc/periodic/hourly/pdc $REPOSITORY_URL/pdc
 
 ### ADD PDC-UPDATER TO CRON (15min)
+curl -L -o /etc/periodic/15min/pdc-updater $REPOSITORY_URL/pdc-updater
