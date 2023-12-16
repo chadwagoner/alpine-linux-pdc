@@ -15,10 +15,24 @@ if [[ ! -d /root/.config/alpine-linux-pdc ]]; then
   echo -e ""
 fi
 
+### SET CONFIG DIRECTORY PERMISSIONS
+if [[ "$(stat -c '%a' /root/.config/alpine-linux-pdc)" != 600 ]]; then
+  echo -e "DIRECTORY PERMISSIONS ARE WRONG, CHANGING..."
+  chown -R /root/.config/alpine-linux-pdc
+  echo -e ""
+fi
+
 ### CREATE EMPTY CONFIG FILE (IF DOESN'T EXIST)
 if [[ ! -f /root/.config/alpine-linux-pdc/config.yaml ]]; then
   echo -e "CONFIG FILE MISSING, CREATING..."
   touch /root/.config/alpine-linux-pdc/config.yaml
+  echo -e ""
+fi
+
+### SET CONFIG FILE PERMISSIONS
+if [[ "$(stat -c '%a' /root/.config/alpine-linux-pdc/config.yaml)" != 600 ]]; then
+  echo -e "FILE PERMISSIONS ARE WRONG, CHANGING..."
+  chown -R /root/.config/alpine-linux-pdc
   echo -e ""
 fi
 
