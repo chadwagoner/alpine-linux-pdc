@@ -94,6 +94,11 @@ else
   echo -e ""
 fi
 
+### RESTART CRON SERVICE
+echo -e "CRON FILE UPDATED, RESTARTING..."
+rc-service crond restart --quiet
+echo -e ""
+
 ### INSTALL OS-UPDATER TO CRON (/etc/periodic/monthly)
 echo -e "INSTALLING OS-UPDATER (/etc/periodic/monthly)"
 curl -L -o /etc/periodic/monthly/os-updater -H '$HEADER_NO_CACHE' $REPOSITORY_URL/os-updater --silent
