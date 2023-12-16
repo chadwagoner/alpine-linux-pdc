@@ -70,7 +70,7 @@ else
 fi
 
 ### INSTALL OS-UPDATER TO CRON (/etc/periodic/monthly)
-echo -e "INSTALLING OS-UPDATER"
+echo -e "INSTALLING OS-UPDATER (/etc/periodic/monthly)"
 curl -L -o /etc/periodic/monthly/os-updater -H '$HEADER_NO_CACHE' $REPOSITORY_URL/os-updater --silent
 echo -e ""
 
@@ -95,7 +95,7 @@ else
 fi
 
 ### INSTALL PDC TO CRON (/etc/periodic/hourly)
-echo -e "INSTALLING PDC"
+echo -e "INSTALLING PDC (/etc/periodic/hourly)"
 curl -L -o /etc/periodic/hourly/pdc -H '$HEADER_NO_CACHE' $REPOSITORY_URL/pdc --silent
 echo -e ""
 
@@ -119,8 +119,8 @@ else
   echo -e ""
 fi
 
-### INSTALL PDC-UPDATER TO CRON (15min)
-echo -e "INSTALLING PDC-UPDATER"
+### INSTALL PDC-UPDATER TO CRON (/etc/periodic/15min)
+echo -e "INSTALLING PDC-UPDATER (/etc/periodic/15min)"
 curl -L -o /etc/periodic/15min/pdc-updater -H '$HEADER_NO_CACHE' $REPOSITORY_URL/pdc-updater --silent
 echo -e ""
 
