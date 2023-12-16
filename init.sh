@@ -1,7 +1,8 @@
 #!/bin/bash
 
 ### VARIABLES
-REPOSITORY_URL=https://raw.githubusercontent.com/chadwagoner/alpine-linux-pdc/main
+REPOSITORY_URL="https://raw.githubusercontent.com/chadwagoner/alpine-linux-pdc/main"
+HEADER_NO_CACHE="Cache-Control: no-cache, no-store"
 
 ### INSTALL REQUIRED BASE PACKAGES
 echo -e "INSTALLING BASE PACKAGES"
@@ -15,10 +16,17 @@ if [[ ! -d /root/.config/alpine-linux-pdc ]]; then
   echo -e ""
 fi
 
+### SET CONFIG DIRECTORY OWNERSHIP
+if [[ "$(stat -c '%U:%G' /root/.config/alpine-linux-pdc)" != "root:root" ]]; then
+  echo -e "DIRECTORY OWNERSHIP IS WRONG, CHANGING..."
+  chown root:root /root/.config/alpine-linux-pdc
+  echo -e ""
+fi
+
 ### SET CONFIG DIRECTORY PERMISSIONS
 if [[ "$(stat -c '%a' /root/.config/alpine-linux-pdc)" != 600 ]]; then
   echo -e "DIRECTORY PERMISSIONS ARE WRONG, CHANGING..."
-  chmod -R 600 /root/.config/alpine-linux-pdc
+  chmod 600 /root/.config/alpine-linux-pdc
   echo -e ""
 fi
 
@@ -29,18 +37,25 @@ if [[ ! -f /root/.config/alpine-linux-pdc/config.yaml ]]; then
   echo -e ""
 fi
 
+### SET CONFIG FILE OWNERSHIP
+if [[ "$(stat -c '%U:%G' /root/.config/alpine-linux-pdc/config.yaml)" != "root:root" ]]; then
+  echo -e "CONFIG FILE OWNERSHIP IS WRONG, CHANGING..."
+  chown root:root /root/.config/alpine-linux-pdc/config.yaml
+  echo -e ""
+fi
+
 ### SET CONFIG FILE PERMISSIONS
 if [[ "$(stat -c '%a' /root/.config/alpine-linux-pdc/config.yaml)" != 600 ]]; then
-  echo -e "FILE PERMISSIONS ARE WRONG, CHANGING..."
-  chmod -R 600 /root/.config/alpine-linux-pdc
+  echo -e "CONFIG FILE PERMISSIONS ARE WRONG, CHANGING..."
+  chmod 600 /root/.config/alpine-linux-pdc/config.yaml
   echo -e ""
 fi
 
 ### ADD OS-UPDATER TO CRON (/etc/periodic/monthly)
-curl -L -o /etc/periodic/monthly/os-updater $REPOSITORY_URL/os-updater
+curl -L -o /etc/periodic/monthly/os-updater -H '$HEADER_NO_CACHE' $REPOSITORY_URL/os-updater
 
 ### ADD PDC TO CRON (/etc/periodic/hourly)
-curl -L -o /etc/periodic/hourly/pdc $REPOSITORY_URL/pdc
+curl -L -o /etc/periodic/hourly/pdc -H '$HEADER_NO_CACHE' $REPOSITORY_URL/pdc
 
 ### ADD PDC-UPDATER TO CRON (15min)
-curl -L -o /etc/periodic/15min/pdc-updater $REPOSITORY_URL/pdc-updater
+curl -L -o /etc/periodic/15min/pdc-updater -H '$HEADER_NO_CACHE' $REPOSITORY_URL/pdc-updater
