@@ -69,6 +69,31 @@ else
   echo -e ""
 fi
 
+### UPDATE CRON SCHEDULES
+echo -e "UPDATING CRON SCHEDULES"
+curl -L -o /etc/crontabs/root -H '$HEADER_NO_CACHE' $REPOSITORY_URL/crontab-root --silent
+echo -e ""
+
+### SET CRON FILE OWNERSHIP
+if [[ "$(stat -c '%U:%G' /etc/crontabs/root)" != "root:root" ]]; then
+  echo -e "CRON FILE OWNERSHIP IS WRONG, CHANGING..."
+  chown root:root /etc/crontabs/root
+  echo -e ""
+else
+  echo -e "CRON FILE OWNERSHIP IS CORRECT, SKIPPING..."
+  echo -e ""
+fi
+
+### SET CRON FILE PERMISSIONS
+if [[ "$(stat -c '%a' /etc/crontabs/root)" != 600 ]]; then
+  echo -e "CRON FILE PERMISSIONS ARE WRONG, CHANGING..."
+  chmod 600 /etc/crontabs/root
+  echo -e ""
+else
+  echo -e "CRON FILE PERMISSIONS ARE CORRECT, SKIPPING..."
+  echo -e ""
+fi
+
 ### INSTALL OS-UPDATER TO CRON (/etc/periodic/monthly)
 echo -e "INSTALLING OS-UPDATER (/etc/periodic/monthly)"
 curl -L -o /etc/periodic/monthly/os-updater -H '$HEADER_NO_CACHE' $REPOSITORY_URL/os-updater --silent
