@@ -3,7 +3,7 @@
 ### VARIABLES
 
 ### APK REPOSITORIES
-echo -e "#/media/sdb1/apks\nhttp://dl-cdn.alpinelinux.org/alpine/v3.19/main\nhttp://dl-cdn.alpinelinux.org/alpine/v3.19/community\n" > /etc/apk/repositories
+echo -e "### CONTROLLED BY PDC\n\n#/media/sdb1/apks\nhttp://dl-cdn.alpinelinux.org/alpine/v3.19/main\nhttp://dl-cdn.alpinelinux.org/alpine/v3.19/community\n" > /etc/apk/repositories
 
 ### DOCKER MODULE
 if [[ $(yq eval '.docker.enabled // false' /root/.config/alpine-linux-pdc/config.yaml) == true ]]; then
