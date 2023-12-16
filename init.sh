@@ -69,11 +69,77 @@ else
   echo -e ""
 fi
 
-### ADD OS-UPDATER TO CRON (/etc/periodic/monthly)
+### INSTALL OS-UPDATER TO CRON (/etc/periodic/monthly)
+echo -e "INSTALLING OS-UPDATER"
 curl -L -o /etc/periodic/monthly/os-updater -H '$HEADER_NO_CACHE' $REPOSITORY_URL/os-updater --silent
+echo -e ""
 
-### ADD PDC TO CRON (/etc/periodic/hourly)
+### SET OS-UPDATER OWNERSHIP
+if [[ "$(stat -c '%U:%G' /etc/periodic/monthly/os-updater)" != "root:root" ]]; then
+  echo -e "OS-UPDATER OWNERSHIP IS WRONG, CHANGING..."
+  chown root:root /etc/periodic/monthly/os-updater
+  echo -e ""
+else
+  echo -e "OS-UPDATER OWNERSHIP IS CORRECT, SKIPPING..."
+  echo -e ""
+fi
+
+### SET OS-UPDATER PERMISSIONS
+if [[ "$(stat -c '%a' /etc/periodic/monthly/os-updater)" != 700 ]]; then
+  echo -e "OS-UPDATER PERMISSIONS ARE WRONG, CHANGING..."
+  chmod 700 /etc/periodic/monthly/os-updater
+  echo -e ""
+else
+  echo -e "OS-UPDATER PERMISSIONS ARE CORRECT, SKIPPING..."
+  echo -e ""
+fi
+
+### INSTALL PDC TO CRON (/etc/periodic/hourly)
+echo -e "INSTALLING PDC"
 curl -L -o /etc/periodic/hourly/pdc -H '$HEADER_NO_CACHE' $REPOSITORY_URL/pdc --silent
+echo -e ""
 
-### ADD PDC-UPDATER TO CRON (15min)
+### SET PDC OWNERSHIP
+if [[ "$(stat -c '%U:%G' /etc/periodic/hourly/pdc)" != "root:root" ]]; then
+  echo -e "PDC OWNERSHIP IS WRONG, CHANGING..."
+  chown root:root /etc/periodic/hourly/pdc
+  echo -e ""
+else
+  echo -e "PDC OWNERSHIP IS CORRECT, SKIPPING..."
+  echo -e ""
+fi
+
+### SET PDC PERMISSIONS
+if [[ "$(stat -c '%a' /etc/periodic/hourly/pdc)" != 700 ]]; then
+  echo -e "PDC PERMISSIONS ARE WRONG, CHANGING..."
+  chmod 700 /etc/periodic/hourly/pdc
+  echo -e ""
+else
+  echo -e "PDC PERMISSIONS ARE CORRECT, SKIPPING..."
+  echo -e ""
+fi
+
+### INSTALL PDC-UPDATER TO CRON (15min)
+echo -e "INSTALLING PDC-UPDATER"
 curl -L -o /etc/periodic/15min/pdc-updater -H '$HEADER_NO_CACHE' $REPOSITORY_URL/pdc-updater --silent
+echo -e ""
+
+### SET PDC-UPDATER OWNERSHIP
+if [[ "$(stat -c '%U:%G' /etc/periodic/15min/pdc-updater)" != "root:root" ]]; then
+  echo -e "PDC-UPDATER OWNERSHIP IS WRONG, CHANGING..."
+  chown root:root /etc/periodic/15min/pdc-updater
+  echo -e ""
+else
+  echo -e "PDC-UPDATER OWNERSHIP IS CORRECT, SKIPPING..."
+  echo -e ""
+fi
+
+### SET PDC-UPDATER PERMISSIONS
+if [[ "$(stat -c '%a' /etc/periodic/15min/pdc-updater)" != 700 ]]; then
+  echo -e "PDC-UPDATER PERMISSIONS ARE WRONG, CHANGING..."
+  chmod 700 /etc/periodic/15min/pdc-updater
+  echo -e ""
+else
+  echo -e "PDC-UPDATER PERMISSIONS ARE CORRECT, SKIPPING..."
+  echo -e ""
+fi
