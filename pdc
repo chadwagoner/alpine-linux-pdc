@@ -5,3 +5,20 @@
 ### APK REPOSITORIES
 echo -e "#/media/sdb1/apks\nhttp://dl-cdn.alpinelinux.org/alpine/v3.19/main\nhttp://dl-cdn.alpinelinux.org/alpine/v3.19/community\n" > /etc/apk/repositories
 
+### DOCKER MODULE
+if [[ $(yq eval '.docker.enabled // false' /root/.config/alpine-linux-pdc/config.yaml) == true ]]; then
+  if [[ -z "$(which docker)" ]]; then
+    ### INSTALL DOCKER
+    apk add -U docker
+
+    ### ENABLE BOOT START
+    rc-update add docker boot
+
+    ### START SERVICE
+    rc-service docker start
+  else
+    echo -e "DOCKER IS ALREADY INSTALLED, SKIPPING..."
+  fi
+else
+  echo -e "DOCKER.ENABLED IS FALSE, SKIPPING..."
+fi
