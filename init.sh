@@ -14,7 +14,7 @@ if [[ ! -d /root/.config/alpine-linux-pdc ]]; then
   echo -e "CONFIG DIRECTORY MISSING, CREATING..."
   mkdir -p /root/.config/alpine-linux-pdc
   echo -e ""
-elif
+else
   echo -e "CONFIG DIRECTORY EXISTS, SKIPPING..."
   echo -e ""
 fi
@@ -24,7 +24,7 @@ if [[ "$(stat -c '%U:%G' /root/.config/alpine-linux-pdc)" != "root:root" ]]; the
   echo -e "CONFIG DIRECTORY OWNERSHIP IS WRONG, CHANGING..."
   chown root:root /root/.config/alpine-linux-pdc
   echo -e ""
-elif
+else
   echo -e "CONFIG DIRECTORY OWNERSHIP IS CORRECT, SKIPPING..."
   echo -e ""
 fi
@@ -34,7 +34,7 @@ if [[ "$(stat -c '%a' /root/.config/alpine-linux-pdc)" != 600 ]]; then
   echo -e "CONFIG DIRECTORY PERMISSIONS ARE WRONG, CHANGING..."
   chmod 600 /root/.config/alpine-linux-pdc
   echo -e ""
-elif
+else
   echo -e "CONFIG DIRECTORY PERMISSIONS ARE CORRECT, SKIPPING..."
   echo -e ""
 fi
@@ -44,7 +44,7 @@ if [[ ! -f /root/.config/alpine-linux-pdc/config.yaml ]]; then
   echo -e "CONFIG FILE MISSING, CREATING..."
   touch /root/.config/alpine-linux-pdc/config.yaml
   echo -e ""
-elif
+else
   echo -e "CONFIG FILE EXISTS, SKIPPING..."
   echo -e ""
 fi
@@ -54,7 +54,7 @@ if [[ "$(stat -c '%U:%G' /root/.config/alpine-linux-pdc/config.yaml)" != "root:r
   echo -e "CONFIG FILE OWNERSHIP IS WRONG, CHANGING..."
   chown root:root /root/.config/alpine-linux-pdc/config.yaml
   echo -e ""
-elif
+else
   echo -e "CONFIG FILE OWNERSHIP IS CORRECT, SKIPPING..."
   echo -e ""
 fi
@@ -64,7 +64,7 @@ if [[ "$(stat -c '%a' /root/.config/alpine-linux-pdc/config.yaml)" != 600 ]]; th
   echo -e "CONFIG FILE PERMISSIONS ARE WRONG, CHANGING..."
   chmod 600 /root/.config/alpine-linux-pdc/config.yaml
   echo -e ""
-elif
+else
   echo -e "CONFIG FILE PERMISSIONS ARE CORRECT, SKIPPING..."
   echo -e ""
 fi
