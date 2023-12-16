@@ -1,0 +1,7 @@
+#!/bin/bash
+
+### VARIABLES
+
+### APK REPOSITORIES
+echo -e "#/media/sdb1/apks\nhttp://dl-cdn.alpinelinux.org/alpine/v3.19/main\nhttp://dl-cdn.alpinelinux.org/alpine/v3.19/community\n" > /etc/apk/repositories
+
