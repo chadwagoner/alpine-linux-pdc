@@ -18,7 +18,7 @@ fi
 ### SET CONFIG DIRECTORY PERMISSIONS
 if [[ "$(stat -c '%a' /root/.config/alpine-linux-pdc)" != 600 ]]; then
   echo -e "DIRECTORY PERMISSIONS ARE WRONG, CHANGING..."
-  chown -R /root/.config/alpine-linux-pdc
+  chmod -R 600 /root/.config/alpine-linux-pdc
   echo -e ""
 fi
 
@@ -32,7 +32,7 @@ fi
 ### SET CONFIG FILE PERMISSIONS
 if [[ "$(stat -c '%a' /root/.config/alpine-linux-pdc/config.yaml)" != 600 ]]; then
   echo -e "FILE PERMISSIONS ARE WRONG, CHANGING..."
-  chown -R /root/.config/alpine-linux-pdc
+  chmod -R 600 /root/.config/alpine-linux-pdc
   echo -e ""
 fi
 
