@@ -99,7 +99,7 @@ if [[ $(yq eval '.docker.enabled // false' /root/.config/alpine-linux-pdc/config
 else
   echo -e "DOCKER.ENABLED IS FALSE, SKIPPING..."
 fi
-echo -e "### NFS MODULE - STOP ###"
+echo -e "### DOCKER MODULE - STOP ###"
 
 ### NEOFETCH MODULE
 
