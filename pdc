@@ -19,6 +19,24 @@ if [[ $(yq eval '.docker.enabled // false' /root/.config/alpine-linux-pdc/config
   else
     echo -e "DOCKER IS ALREADY INSTALLED, SKIPPING..."
   fi
+
+  if [[ $(yq eval '.docker.containers.portainer // false' /root/.config/alpine-linux-pdc/config.yaml) == true ]]; then
+    if [[ -z "$(docker container list --filter 'name=portainer' --quiet)" ]]; then
+      if [[ -z "$(docker volume list --filter 'name=portainer_data' --quiet)" ]]; then
+        ### CREATE PORTAINER_DATA VOLUME
+        docker volume create portainer_data
+      else
+        echo -e "PORTAINER_DATA VOLUME EXISTS, SKIPPING..."
+      fi
+
+      ### CREATE PORTAINER CONTAINER
+      docker run -d -p 9443:9443 --name portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data -l com.centurylinklabs.watchtower.enable=true portainer/portainer-ce:latest
+    else
+      echo -e "PORTAINER CONTAINER EXISTS, SKIPPING..."
+    fi
+  else
+    echo -e "DOCKER.CONTAINERS.PORTAINER IS FALSE, SKIPPING"
+  fi
 else
   echo -e "DOCKER.ENABLED IS FALSE, SKIPPING..."
 fi
