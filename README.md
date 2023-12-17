@@ -28,7 +28,7 @@ curl -L -H 'Cache-Control: no-cache, no-store' https://raw.githubusercontent.com
 system:
   nfs:
     enabled: (true/false) [default: false]
-    address: (ip_address) [default: null]
+    address: (ip_address) [default: ""]
     mounts:
       backup: (true/false) [default: false]
       media: (true/false) [default: false]
