@@ -5,11 +5,51 @@
 ### APK REPOSITORIES
 echo -e "### CONTROLLED BY PDC\n\n#/media/sdb1/apks\nhttp://dl-cdn.alpinelinux.org/alpine/v3.19/main\nhttp://dl-cdn.alpinelinux.org/alpine/v3.19/community\n" > /etc/apk/repositories
 
+### NFS MODULE
+if [[ $(yq eval '.system.nfs.enabled // false' /root/.config/alpine-linux-pdc/config.yaml) == true ]]; then
+  if [[ -z "$(which nfsstat)" ]]; then
+    ### INSTALL NFS-UTILS
+    apk add -U nfs-utils --quiet
+
+    ### ENABLE BOOT START
+    rc-update add nfsmount
+
+    ### START SERVICE
+    rc-service nfsmount start
+  else
+    echo -e "NFS-UTILS IS ALREADY INSTALLED, SKIPPING..."
+  fi
+
+  if [[ $(yq eval '.system.nfs.mounts.media // false' /root/.config/alpine-linux-pdc/config.yaml) == true ]]; then
+    ### CREATE BINDING DIRECTORY
+    mkdir -p /mnt/media
+
+    if [[ -z "$(grep -qs '/mnt/media ' /proc/mounts)" ]]; then
+      if [[ -z "$(grep -qs '/mnt/media' /etc/fstab)" ]]; then
+        ### CREATE NFS MOUNT ENTRY IN FSTAB
+        echo -e "$(yq eval '.system.nfs.address // \"\"' /root/.config/alpine-linux-pdc/config.yaml):/volume1/media /mnt/media nfs rw,vers=4,rsize=32768,wsize=32768,soft 0 0" >> /etc/fstab
+
+        ### MOUNT
+        mount -a
+      else
+        ### MOUNT
+        mount -a
+      fi
+    else
+      echo -e "MEDIA MOUNT EXISTS, SKIPPING..."
+    fi
+  else
+    echo -e "SYSTEM.NFS.MOUNTS.MEDIA IS FALSE, SKIPPING..."
+  fi
+else
+  echo -e "SYSTEM.NFS.ENABLED IS FALSE, SKIPPING..."
+fi
+
 ### DOCKER MODULE
 if [[ $(yq eval '.docker.enabled // false' /root/.config/alpine-linux-pdc/config.yaml) == true ]]; then
   if [[ -z "$(which docker)" ]]; then
     ### INSTALL DOCKER
-    apk add -U docker
+    apk add -U docker --quiet
 
     ### ENABLE BOOT START
     rc-update add docker boot
@@ -40,3 +80,7 @@ if [[ $(yq eval '.docker.enabled // false' /root/.config/alpine-linux-pdc/config
 else
   echo -e "DOCKER.ENABLED IS FALSE, SKIPPING..."
 fi
+
+### NEOFETCH MODULE
+
+### UFW MODULE
