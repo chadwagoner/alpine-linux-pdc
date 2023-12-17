@@ -5,6 +5,17 @@
 ### APK REPOSITORIES
 echo -e "### CONTROLLED BY PDC\n\n#/media/sdb1/apks\nhttp://dl-cdn.alpinelinux.org/alpine/v3.19/main\nhttp://dl-cdn.alpinelinux.org/alpine/v3.19/community\n" > /etc/apk/repositories
 
+### DRIVERS
+echo -e "### DRIVERS MODULE - START ###"
+if [[ $(yq eval '.system.drivers.amd // false' /root/.config/alpine-linux-pdc/config.yaml) == true ]]; then
+  ### PENDING SUPPORT
+  echo -e "DON'T SUPPORT AMD CURRENTLY, NO DEVICES"
+elif [[ $(yq eval '.system.drivers.intel // false' /root/.config/alpine-linux-pdc/config.yaml) == true ]]; then
+  echo -e "INSTALLING BASE PACKAGES"
+  apk add -U intel-media-driver mesa-dri-gallium --quiet
+fi
+echo -e "### DRIVERS MODULE - STOP ###"
+
 ### NFS MODULE
 echo -e "### NFS MODULE - START ###"
 if [[ $(yq eval '.system.nfs.enabled // false' /root/.config/alpine-linux-pdc/config.yaml) == true ]]; then
