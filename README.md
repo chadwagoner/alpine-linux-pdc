@@ -25,7 +25,13 @@ curl -L -H 'Cache-Control: no-cache, no-store' https://raw.githubusercontent.com
 ### VALUES
 
 ```yaml
-global:
+system:
+  nfs:
+    enabled: (true/false) [default: false]
+    address: (ip_address) [default: null]
+    mounts:
+      backup: (true/false) [default: false]
+      media: (true/false) [default: false]
 docker:
   enabled: (true/false) [default: false]
   containers:
