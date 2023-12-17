@@ -6,15 +6,19 @@
 echo -e "### CONTROLLED BY PDC\n\n#/media/sdb1/apks\nhttp://dl-cdn.alpinelinux.org/alpine/v3.19/main\nhttp://dl-cdn.alpinelinux.org/alpine/v3.19/community\n" > /etc/apk/repositories
 
 ### NFS MODULE
+echo -e "### NFS MODULE - START ###"
 if [[ $(yq eval '.system.nfs.enabled // false' /root/.config/alpine-linux-pdc/config.yaml) == true ]]; then
   if [[ -z "$(which nfsstat)" ]]; then
     ### INSTALL NFS-UTILS
+    echo -e "INSTALLING NFS-UTILS"
     apk add -U nfs-utils --quiet
 
     ### ENABLE BOOT START
+    echo -e "ENABLE BOOT START"
     rc-update add nfsmount
 
     ### START SERVICE
+    echo -e "START SERVICE"
     rc-service nfsmount start
   else
     echo -e "NFS-UTILS IS ALREADY INSTALLED, SKIPPING..."
@@ -23,6 +27,7 @@ if [[ $(yq eval '.system.nfs.enabled // false' /root/.config/alpine-linux-pdc/co
   if [[ $(yq eval '.system.nfs.mounts.media // false' /root/.config/alpine-linux-pdc/config.yaml) == true ]]; then
     if [[ ! -d /mnt/media ]]; then
       ### CREATE BINDING DIRECTORY
+      echo -e "CREATING BINDING DIRECTORY"
       mkdir -p /mnt/media
     else
       echo -e "BINDING DIRECTORY EXISTS, SKIPPING..."
@@ -31,12 +36,15 @@ if [[ $(yq eval '.system.nfs.enabled // false' /root/.config/alpine-linux-pdc/co
     if [[ -z "$(grep '/mnt/media ' /proc/mounts)" ]]; then
       if [[ -z "$(grep '/mnt/media' /etc/fstab)" ]]; then
         ### CREATE NFS MOUNT ENTRY IN FSTAB
+        echo -e "ADDING NFS MOUNT IN FSTAB"
         echo -e "$(yq eval '.system.nfs.address // ""' /root/.config/alpine-linux-pdc/config.yaml):/volume1/media /mnt/media nfs rw,vers=4,rsize=32768,wsize=32768,soft 0 0" >> /etc/fstab
 
         ### MOUNT
+        echo -e "MOUNTING"
         mount -a
       else
         ### MOUNT
+        echo -e "MOUNTING"
         mount -a
       fi
     else
@@ -48,17 +56,22 @@ if [[ $(yq eval '.system.nfs.enabled // false' /root/.config/alpine-linux-pdc/co
 else
   echo -e "SYSTEM.NFS.ENABLED IS FALSE, SKIPPING..."
 fi
+echo -e "### NFS MODULE - STOP ###"
 
 ### DOCKER MODULE
+echo -e "### DOCKER MODULE - START ###"
 if [[ $(yq eval '.docker.enabled // false' /root/.config/alpine-linux-pdc/config.yaml) == true ]]; then
   if [[ -z "$(which docker)" ]]; then
     ### INSTALL DOCKER
+    echo -e "INSTALLING DOCKER"
     apk add -U docker --quiet
 
     ### ENABLE BOOT START
+    echo -e "ENABLE BOOT START"
     rc-update add docker boot
 
     ### START SERVICE
+    echo -e "START SERVICE"
     rc-service docker start
   else
     echo -e "DOCKER IS ALREADY INSTALLED, SKIPPING..."
@@ -68,12 +81,14 @@ if [[ $(yq eval '.docker.enabled // false' /root/.config/alpine-linux-pdc/config
     if [[ -z "$(docker container list --filter 'name=portainer' --quiet)" ]]; then
       if [[ -z "$(docker volume list --filter 'name=portainer_data' --quiet)" ]]; then
         ### CREATE PORTAINER_DATA VOLUME
+        echo -e "CREATING PORTAINER_DATA VOLUME"
         docker volume create portainer_data
       else
         echo -e "PORTAINER_DATA VOLUME EXISTS, SKIPPING..."
       fi
 
       ### CREATE PORTAINER CONTAINER
+      echo -e "CREATING PORTAINER CONTAINER"
       docker run -d -p 9443:9443 --name portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data -l com.centurylinklabs.watchtower.enable=true portainer/portainer-ce:latest
     else
       echo -e "PORTAINER CONTAINER EXISTS, SKIPPING..."
@@ -84,6 +99,7 @@ if [[ $(yq eval '.docker.enabled // false' /root/.config/alpine-linux-pdc/config
 else
   echo -e "DOCKER.ENABLED IS FALSE, SKIPPING..."
 fi
+echo -e "### NFS MODULE - STOP ###"
 
 ### NEOFETCH MODULE
 
