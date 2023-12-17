@@ -26,6 +26,9 @@ curl -L -H 'Cache-Control: no-cache, no-store' https://raw.githubusercontent.com
 
 ```yaml
 system:
+  drivers:
+    amd: (true/false) [default: false]
+    intel: (true/false) [default: false]
   nfs:
     enabled: (true/false) [default: false]
     address: (ip_address) [default: ""]
