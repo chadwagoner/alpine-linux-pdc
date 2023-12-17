@@ -28,6 +28,8 @@ curl -L -H 'Cache-Control: no-cache, no-store' https://raw.githubusercontent.com
 global:
 docker:
   enabled: (true/false) [default: false]
+  containers:
+    portainer: (true/false) [default: false]
 neofetch:
   enabled: (true/false) [default: false]
 ufw:
