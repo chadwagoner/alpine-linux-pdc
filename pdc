@@ -27,7 +27,7 @@ if [[ $(yq eval '.system.nfs.enabled // false' /root/.config/alpine-linux-pdc/co
     if [[ -z "$(grep -qs '/mnt/media ' /proc/mounts)" ]]; then
       if [[ -z "$(grep -qs '/mnt/media' /etc/fstab)" ]]; then
         ### CREATE NFS MOUNT ENTRY IN FSTAB
-        echo -e "$(yq eval '.system.nfs.address // \"\"' /root/.config/alpine-linux-pdc/config.yaml):/volume1/media /mnt/media nfs rw,vers=4,rsize=32768,wsize=32768,soft 0 0" >> /etc/fstab
+        echo -e "$(yq eval '.system.nfs.address // ""' /root/.config/alpine-linux-pdc/config.yaml):/volume1/media /mnt/media nfs rw,vers=4,rsize=32768,wsize=32768,soft 0 0" >> /etc/fstab
 
         ### MOUNT
         mount -a
