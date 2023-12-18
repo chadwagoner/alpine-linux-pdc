@@ -2,13 +2,13 @@
 
 ## INSTALLATION
 
-Since Alpine Linux doesn't come preinstalled with curl, that will need to be installed first.
+Since Alpine Linux doesn't come preinstalled with curl, that will need to be installed first
 
 ```bash
 apk add -U curl
 ```
 
-Once curl is installed, simply run the following command to create the required directories/files for cron based pdc.
+Once curl is installed, simply run the following command to create the required directories/files for cron based pdc
 
 ```bash
 curl -L -H 'Cache-Control: no-cache, no-store' https://raw.githubusercontent.com/chadwagoner/alpine-linux-pdc/main/init.sh | bash
@@ -27,26 +27,50 @@ curl -L -H 'Cache-Control: no-cache, no-store' https://raw.githubusercontent.com
 ```yaml
 system:
   drivers:
-    amd: (true/false) [default: false]
-    intel: (true/false) [default: false]
+    amd: (true/false)                 [default: false]
+    intel: (true/false)               [default: false]
   nfs:
-    enabled: (true/false) [default: false]
-    address: (ip_address) [default: ""]
+    enabled: (true/false)             [default: false]
+    address: (string)                 [default: ""]
     mounts:
-      backup: (true/false) [default: false]
-      media: (true/false) [default: false]
+      backup: (true/false)            [default: false]
+      media: (true/false)             [default: false]
   tailscale:
-    enabled: (true/false) [default: false]
+    enabled: (true/false)             [default: false]
+    exit: (true/false)                [default: false]
+    ssh: (true/false)                 [default: false]
+    subnet: (true/false)              [default: false]
 docker:
-  enabled: (true/false) [default: false]
+  enabled: (true/false)               [default: false]
   containers:
-    portainer: (true/false) [default: false]
+    portainer: (true/false)           [default: false]
   ingress: 
-    enabled: (true/false) [default: false]
-    traefik: (true/false) [default: false]
-  user: (string) [default: ""]
+    enabled: (true/false)             [default: false]
+    traefik: (true/false)             [default: false]
+  user: (string)                      [default: ""]
 neofetch:
-  enabled: (true/false) [default: false]
+  enabled: (true/false)               [default: false]
 ufw:
-  enabled: (true/false) [default: false]
+  enabled: (true/false)               [default: false]
+```
+
+## APP SPECIFIC CONFIGURATION
+
+### TAILSCALE
+
+#### INSTALLATION
+
+```yaml
+system:
+  tailscale:
+    enabled: true
+```
+
+#### CONFIGURATION
+
+Run the following command to start tailscale and follow instructions for authentication
+
+```bash
+tailscale up
+```
 ```
