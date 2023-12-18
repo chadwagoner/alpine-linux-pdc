@@ -39,8 +39,7 @@ docker:
   enabled: (true/false) [default: false]
   containers:
     portainer: (true/false) [default: false]
-  ingress:
-    caddy: (true/false) [default: false]
+  ingress: (true/false) [default: false]
   user: (string) [default: ""]
 neofetch:
   enabled: (true/false) [default: false]
