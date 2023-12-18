@@ -35,6 +35,8 @@ system:
     mounts:
       backup: (true/false) [default: false]
       media: (true/false) [default: false]
+  tailscale:
+    enabled: (true/false) [default: false]
 docker:
   enabled: (true/false) [default: false]
   containers:
