@@ -74,6 +74,26 @@ else
 fi
 echo -e "### NFS MODULE - STOP ###"
 
+### TAILSCALE MODULE
+echo -e "### TAILSCALE MODULE - START ###"
+if [[ $(yq eval '.system.tailscale.enabled // false' $CONFIG) == true ]]; then
+  if [[ -z "$(which tailscale)" ]]; then
+    echo -e "INSTALLING TAILSCALE"
+    apk add -U tailscale --quiet
+
+    echo -e "ENABLE START"
+    rc-update add tailscale
+
+    echo -e "START SERVICE"
+    rc-service tailscale start
+  else
+    echo -e "TAILSCALE IS ALREADY INSTALLED, SKIPPING..."
+  fi
+else
+  echo -e "SYSTEM.TAILSCALE.ENABLED IS FALSE, SKIPPING..."
+fi
+echo -e "### TAILSCALE MODULE - STOP ###"
+
 ### DOCKER MODULE
 echo -e "### DOCKER MODULE - START ###"
 if [[ $(yq eval '.docker.enabled // false' /root/.config/alpine-linux-pdc/config.yaml) == true ]]; then
