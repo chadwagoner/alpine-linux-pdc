@@ -153,7 +153,7 @@ if [[ $(yq eval '.docker.enabled // false' /root/.config/alpine-linux-pdc/config
 
       ### CREATE PORTAINER CONTAINER
       echo -e "CREATING PORTAINER CONTAINER"
-      docker run -d -p 9443:9443 --name portainer --restart=always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data -l com.centurylinklabs.watchtower.enable=true portainer/portainer-ce:latest
+      docker run -d -p 9443:9443 --name portainer --restart=always -v /etc/localtime:/etc/localtime:ro -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data -l com.centurylinklabs.watchtower.enable=true portainer/portainer-ce:latest
     else
       echo -e "PORTAINER CONTAINER EXISTS, SKIPPING..."
     fi
