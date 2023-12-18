@@ -133,7 +133,7 @@ if [[ $(yq eval '.docker.enabled // false' /root/.config/alpine-linux-pdc/config
     if [[ -z "$(docker network list --filter 'name=proxy' --quiet)" ]]; then
       echo -e "CREATING PROXY NETWORK"
       docker network create proxy
-    then
+    else
       echo -e "PROXY NETWORK EXISTS, SKIPPING..."
     fi
   else
