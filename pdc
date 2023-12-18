@@ -76,6 +76,7 @@ echo -e "### NFS MODULE - STOP ###"
 ### DOCKER MODULE
 echo -e "### DOCKER MODULE - START ###"
 if [[ $(yq eval '.docker.enabled // false' /root/.config/alpine-linux-pdc/config.yaml) == true ]]; then
+  ### INSTALL DOCKER
   if [[ -z "$(which docker)" ]]; then
     ### INSTALL DOCKER
     echo -e "INSTALLING DOCKER"
@@ -92,6 +93,21 @@ if [[ $(yq eval '.docker.enabled // false' /root/.config/alpine-linux-pdc/config
     echo -e "DOCKER IS ALREADY INSTALLED, SKIPPING..."
   fi
 
+  ### ADD DOCKER GROUP TO USER
+  if [[ -n $(yq eval '.docker.user // ""' /root/.config/alpine-linux-pdc/config.yaml) ]]; then
+    if [[ -z $(groups alpine | grep docker) ]]; then
+      ### ADD DOCKER GROUP TO USER
+      echo -e "ADDING DOCKER GROUP TO $(yq eval '.docker.user // ""' /root/.config/alpine-linux-pdc/config.yaml)"
+      addgroup $(yq eval '.docker.user // ""' /root/.config/alpine-linux-pdc/config.yaml) docker
+    else
+      ### DOCKER GROUP EXISTS FOR USER
+      echo -e "DOCKER GROUP EXISTS FOR $(yq eval '.docker.user // ""' /root/.config/alpine-linux-pdc/config.yaml), SKIPPING..."
+    fi
+  else
+    echo -e "DOCKER.USER IS NULL, SKIPPING..."
+  fi
+
+  ### INSTALL PORTAINER
   if [[ $(yq eval '.docker.containers.portainer // false' /root/.config/alpine-linux-pdc/config.yaml) == true ]]; then
     if [[ -z "$(docker container list --filter 'name=portainer' --quiet)" ]]; then
       if [[ -z "$(docker volume list --filter 'name=portainer_data' --quiet)" ]]; then
