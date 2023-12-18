@@ -1,11 +1,12 @@
 #!/bin/bash
 
 ### VARIABLES
+CONFIG="/root/.config/alpine-linux-pdc/config.yaml"
 
 ### APK REPOSITORIES
 echo -e "### CONTROLLED BY PDC\n\n#/media/sdb1/apks\nhttp://dl-cdn.alpinelinux.org/alpine/v3.19/main\nhttp://dl-cdn.alpinelinux.org/alpine/v3.19/community\n" > /etc/apk/repositories
 
-### DRIVERS
+### DRIVERS MODULE
 echo -e "### DRIVERS MODULE - START ###"
 if [[ $(yq eval '.system.drivers.amd // false' /root/.config/alpine-linux-pdc/config.yaml) == true ]]; then
   ### PENDING SUPPORT
@@ -105,6 +106,18 @@ if [[ $(yq eval '.docker.enabled // false' /root/.config/alpine-linux-pdc/config
     fi
   else
     echo -e "DOCKER.USER IS NULL, SKIPPING..."
+  fi
+
+  ### INGRESS PROXY NETWORK
+  if [[ $(yq eval '.docker.ingress // false' $CONFIG) == true ]]; then
+    if [[ -z "$(docker network list --filter 'name=proxy' --quiet)" ]]; then
+      echo -e "CREATING PROXY NETWORK"
+      docker network create proxy
+    then
+      echo -e "PROXY NETWORK EXISTS, SKIPPING..."
+    fi
+  else
+    echo -e "DOCKER.INGRESS IS FALSE, SKIPPING..."
   fi
 
   ### INSTALL PORTAINER
