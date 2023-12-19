@@ -38,7 +38,6 @@ system:
   tailscale:
     enabled: (true/false)             [default: false]
     exit: (true/false)                [default: false]
-    ssh: (true/false)                 [default: false]
     subnet: (true/false)              [default: false]
 docker:
   enabled: (true/false)               [default: false]
@@ -71,6 +70,23 @@ system:
 Run the following command to start tailscale and follow instructions for authentication
 
 ```bash
-tailscale up
+tailscale up --qr
 ```
+
+Add the following parameter for exit node
+
+```bash
+--advertise-exit-node
+```
+
+Add the following parameter for ssh ability
+
+```bash
+--ssh
+```
+
+Add the following parameter for subnet routing
+
+```bash
+--advertise-routes=<ip-address-range>
 ```
