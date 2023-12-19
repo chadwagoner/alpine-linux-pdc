@@ -146,60 +146,48 @@ if [[ $(yq eval '.docker.enabled // false' $CONFIG) == true ]]; then
     if [[ ! -d /root/.config/traefik ]]; then
       echo -e "TRAEFIK DIRECTORY MISSING, CREATING..."
       mkdir -p /root/.config/traefik
-      echo -e ""
     else
       echo -e "TRAEFIK DIRECTORY EXISTS, SKIPPING..."
-      echo -e ""
     fi
 
     ### CREATE ACME.JSON FILE
     if [[ ! -f /root/.config/traefik/acme.json ]]; then
       echo -e "ACME.JSON MISSING, CREATING..."
       touch /root/.config/traefik/acme.json
-      echo -e ""
     else
       echo -e "ACME.JSON EXISTS, SKIPPING..."
-      echo -e ""
     fi
 
     ### SET ACME.JSON OWNERSHIP
     if [[ "$(stat -c '%U:%G' /root/.config/traefik/acme.json)" != "root:root" ]]; then
       echo -e "ACME.JSON OWNERSHIP IS WRONG, CHANGING..."
       chown root:root /root/.config/traefik/acme.json
-      echo -e ""
     else
       echo -e "ACME.JSON OWNERSHIP IS CORRECT, SKIPPING..."
-      echo -e ""
     fi
 
     ### SET ACME.JSON PERMISSIONS
     if [[ "$(stat -c '%a' /root/.config/traefik/acme.json)" != 600 ]]; then
       echo -e "ACME.JSON PERMISSIONS ARE WRONG, CHANGING..."
       chmod 600 /root/.config/traefik/acme.json
-      echo -e ""
     else
       echo -e "ACME.JSON PERMISSIONS ARE CORRECT, SKIPPING..."
-      echo -e ""
     fi
 
     ### CREATE CONFIG.YML FILE
     if [[ ! -f /root/.config/traefik/config.yml ]]; then
       echo -e "CONFIG.YML MISSING, CREATING..."
       touch /root/.config/traefik/config.yml
-      echo -e ""
     else
       echo -e "CONFIG.YML EXISTS, SKIPPING..."
-      echo -e ""
     fi
 
     ### CREATE TRAEFIK.YML FILE
     if [[ ! -f /root/.config/traefik/traefik.yml ]]; then
       echo -e "TRAEFIK.YML MISSING, CREATING..."
       touch /root/.config/traefik/traefik.yml
-      echo -e ""
     else
       echo -e "TRAEFIK.YML EXISTS, SKIPPING..."
-      echo -e ""
     fi
   else
     echo -e "DOCKER.INGRESS.TRAEFIK IS FALSE, SKIPPING..."
