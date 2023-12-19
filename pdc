@@ -96,7 +96,7 @@ if [[ $(yq eval '.system.tailscale.enabled // false' $CONFIG) == true ]]; then
       echo -e "99-TAILSCALE.CONF MISSING, CREATING..."
       echo -e "net.ipv4.ip_forward = 1\nnet.ipv6.conf.all.forwarding = 1" > /etc/sysctl.d/99-tailscale.conf
       echo -e "RELOADING SYSCTL"
-      sysctl -p /etc/sysctl.d/99-tailscale.conf
+      sysctl -q -p /etc/sysctl.d/99-tailscale.conf
     else
       echo -e "99-TAILSCALE.CONF EXISTS, SKIPPING..."
     fi
