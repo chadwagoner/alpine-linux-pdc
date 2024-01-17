@@ -1,6 +1,6 @@
 #!/bin/bash
 
-### VARIABLES
+### GLOBAL VARIABLES
 CONFIG="/root/.config/alpine-linux-pdc/config.yaml"
 
 ### APK REPOSITORIES

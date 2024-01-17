@@ -1,6 +1,6 @@
 #!/bin/bash
 
-### VARIABLES
+### GLOBAL VARIABLES
 REPOSITORY_URL=https://raw.githubusercontent.com/chadwagoner/alpine-linux-pdc/main
 HEADER_NO_CACHE="Cache-Control: no-cache, no-store"
 
