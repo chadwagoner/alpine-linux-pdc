@@ -191,6 +191,7 @@ else
     fi
   else
     echo -e "OS-UPDATER LATEST, SKIPPING..."
+    echo -e ""
   fi
 fi
 
@@ -249,6 +250,7 @@ else
     fi
   else
     echo -e "PDC LATEST, SKIPPING..."
+    echo -e ""
   fi
 fi
 
@@ -311,5 +313,6 @@ else
     fi
   else
     echo -e "PDC-UPDATER LATEST, SKIPPING..."
+    echo -e ""
   fi
 fi
