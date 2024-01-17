@@ -4,27 +4,52 @@
 REPOSITORY_URL=https://raw.githubusercontent.com/chadwagoner/alpine-linux-pdc/main
 HEADER_NO_CACHE="Cache-Control: no-cache, no-store"
 
-### UPDATE PDC TO CRON (/etc/periodic/hourly)
-echo -e "UPDATING PDC"
-curl -L -o /etc/periodic/hourly/pdc -H '$HEADER_NO_CACHE' $REPOSITORY_URL/pdc --silent
-echo -e ""
+### GLOBAL FUNCTIONS
+create_directory () {
+  mkdir -p $1
+}
 
-### SET PDC OWNERSHIP
-if [[ "$(stat -c '%U:%G' /etc/periodic/hourly/pdc)" != "root:root" ]]; then
-  echo -e "PDC OWNERSHIP IS WRONG, CHANGING..."
-  chown root:root /etc/periodic/hourly/pdc
-  echo -e ""
-else
-  echo -e "PDC OWNERSHIP IS CORRECT, SKIPPING..."
-  echo -e ""
-fi
+create_file () {
+  touch $1
+}
 
-### SET PDC PERMISSIONS
-if [[ "$(stat -c '%a' /etc/periodic/hourly/pdc)" != 700 ]]; then
-  echo -e "PDC PERMISSIONS ARE WRONG, CHANGING..."
-  chmod 700 /etc/periodic/hourly/pdc
+set_ownership () {
+  chown $2:$2 $1
+}
+
+set_permission () {
+  chmod $2 $1
+}
+
+### UPDATE PDC
+LOCAL_PDC=$(cat /etc/periodic/hourly/pdc | sha256sum | awk '{print $1}')
+REMOTE_PDC=$(curl -sL -H 'HEADER_NO_CACHE' $REPOSITORY_URL/scripts/pdc | sha256sum | awk '{print $1}')
+
+if [[ $LOCAL_PDC != $REMOTE_PDC ]]; then
+  echo -e "PDC MISMATCH, UPDATING..."
+  curl -sL -o /etc/periodic/hourly/pdc -H '$HEADER_NO_CACHE' $REPOSITORY_URL/scripts/pdc
   echo -e ""
+
+  ### SET PDC OWNERSHIP
+  if [[ "$(stat -c '%U:%G' /etc/periodic/hourly/pdc)" != "root:root" ]]; then
+    echo -e "PDC OWNERSHIP IS WRONG, CHANGING..."
+    set_ownership /etc/periodic/hourly/pdc root
+    echo -e ""
+  else
+    echo -e "PDC OWNERSHIP IS CORRECT, SKIPPING..."
+    echo -e ""
+  fi
+
+  ### SET PDC PERMISSIONS
+  if [[ "$(stat -c '%a' /etc/periodic/hourly/pdc)" != 700 ]]; then
+    echo -e "PDC PERMISSIONS ARE WRONG, CHANGING..."
+    set_permission /etc/periodic/hourly/pdc 700
+    echo -e ""
+  else
+    echo -e "PDC PERMISSIONS ARE CORRECT, SKIPPING..."
+    echo -e ""
+  fi
 else
-  echo -e "PDC PERMISSIONS ARE CORRECT, SKIPPING..."
+  echo -e "PDC LATEST, SKIPPING..."
   echo -e ""
 fi
