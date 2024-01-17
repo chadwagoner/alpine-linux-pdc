@@ -98,7 +98,7 @@ REMOTE_ROOT=$(curl -sL -H 'HEADER_NO_CACHE' $REPOSITORY_URL/templates/crontab-ro
 
 if [[ $LOCAL_ROOT != $REMOTE_ROOT ]]; then
   echo -e "CRON FILE MISMATCH, UPDATING..."
-  curl -sL -o /etc/crontabs/root -H '$HEADER_NO_CACHE' $REPOSITORY_URL/crontab-root
+  curl -sL -o /etc/crontabs/root -H '$HEADER_NO_CACHE' $REPOSITORY_URL/templates/crontab-root
   echo -e ""
 
   ### SET CRON FILE OWNERSHIP
