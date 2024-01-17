@@ -128,81 +128,188 @@ if [[ $LOCAL_ROOT != $REMOTE_ROOT ]]; then
   rc-service crond restart --quiet
   echo -e ""
 else
-  echo -e "CRON FILE SAME, SKIPPING..."
+  echo -e "CRON FILE LATEST, SKIPPING..."
   echo -e ""
 fi
 
-# ### INSTALL OS-UPDATER TO CRON (/etc/periodic/monthly)
-# echo -e "INSTALLING OS-UPDATER (/etc/periodic/monthly)"
-# curl -L -o /etc/periodic/monthly/os-updater -H '$HEADER_NO_CACHE' $REPOSITORY_URL/os-updater --silent
-# echo -e ""
+### INSTALL OS-UPDATER
+if [[ ! -f /etc/periodic/monthly/os-updater ]]; then
+  echo -e "OS-UPDATER MISSING, INSTALLING..."
+  curl -sL -o /etc/periodic/monthly/os-updater -H '$HEADER_NO_CACHE' $REPOSITORY_URL/scripts/os-updater
+  echo -e ""
 
-# ### SET OS-UPDATER OWNERSHIP
-# if [[ "$(stat -c '%U:%G' /etc/periodic/monthly/os-updater)" != "root:root" ]]; then
-#   echo -e "OS-UPDATER OWNERSHIP IS WRONG, CHANGING..."
-#   chown root:root /etc/periodic/monthly/os-updater
-#   echo -e ""
-# else
-#   echo -e "OS-UPDATER OWNERSHIP IS CORRECT, SKIPPING..."
-#   echo -e ""
-# fi
+  ### SET OS-UPDATER OWNERSHIP
+  if [[ "$(stat -c '%U:%G' /etc/periodic/monthly/os-updater)" != "root:root" ]]; then
+    echo -e "OS-UPDATER OWNERSHIP IS WRONG, CHANGING..."
+    # chown root:root /etc/periodic/monthly/os-updater
+    set_ownership /etc/periodic/monthly/os-updater root
+    echo -e ""
+  else
+    echo -e "OS-UPDATER OWNERSHIP IS CORRECT, SKIPPING..."
+    echo -e ""
+  fi
 
-# ### SET OS-UPDATER PERMISSIONS
-# if [[ "$(stat -c '%a' /etc/periodic/monthly/os-updater)" != 700 ]]; then
-#   echo -e "OS-UPDATER PERMISSIONS ARE WRONG, CHANGING..."
-#   chmod 700 /etc/periodic/monthly/os-updater
-#   echo -e ""
-# else
-#   echo -e "OS-UPDATER PERMISSIONS ARE CORRECT, SKIPPING..."
-#   echo -e ""
-# fi
+  ### SET OS-UPDATER PERMISSIONS
+  if [[ "$(stat -c '%a' /etc/periodic/monthly/os-updater)" != 700 ]]; then
+    echo -e "OS-UPDATER PERMISSIONS ARE WRONG, CHANGING..."
+    # chmod 700 /etc/periodic/monthly/os-updater
+    set_permission /etc/periodic/monthly/os-updater 700
+    echo -e ""
+  else
+    echo -e "OS-UPDATER PERMISSIONS ARE CORRECT, SKIPPING..."
+    echo -e ""
+  fi
+else
+  LOCAL_OS_UPDATER=$(cat /etc/periodic/monthly/os-updater | sha256sum | awk '{print $1}')
+  REMOTE_OS_UPDATER=$(curl -sL -H 'HEADER_NO_CACHE' $REPOSITORY_URL/scripts/os-updater | sha256sum | awk '{print $1}')
 
-# ### INSTALL PDC TO CRON (/etc/periodic/hourly)
-# echo -e "INSTALLING PDC (/etc/periodic/hourly)"
-# curl -L -o /etc/periodic/hourly/pdc -H '$HEADER_NO_CACHE' $REPOSITORY_URL/pdc --silent
-# echo -e ""
+  if [[ $LOCAL_OS_UPDATER != $REMOTE_OS_UPDATER ]]; then
+    echo -e "OS-UPDATER MISMATCH, UPDATING..."
+    curl -sL -o /etc/periodic/monthly/os-updater -H '$HEADER_NO_CACHE' $REPOSITORY_URL/scripts/os-updater
+    echo -e ""
 
-# ### SET PDC OWNERSHIP
-# if [[ "$(stat -c '%U:%G' /etc/periodic/hourly/pdc)" != "root:root" ]]; then
-#   echo -e "PDC OWNERSHIP IS WRONG, CHANGING..."
-#   chown root:root /etc/periodic/hourly/pdc
-#   echo -e ""
-# else
-#   echo -e "PDC OWNERSHIP IS CORRECT, SKIPPING..."
-#   echo -e ""
-# fi
+    ### SET OS-UPDATER OWNERSHIP
+    if [[ "$(stat -c '%U:%G' /etc/periodic/monthly/os-updater)" != "root:root" ]]; then
+      echo -e "OS-UPDATER OWNERSHIP IS WRONG, CHANGING..."
+      # chown root:root /etc/periodic/monthly/os-updater
+      set_ownership /etc/periodic/monthly/os-updater root
+      echo -e ""
+    else
+      echo -e "OS-UPDATER OWNERSHIP IS CORRECT, SKIPPING..."
+      echo -e ""
+    fi
 
-# ### SET PDC PERMISSIONS
-# if [[ "$(stat -c '%a' /etc/periodic/hourly/pdc)" != 700 ]]; then
-#   echo -e "PDC PERMISSIONS ARE WRONG, CHANGING..."
-#   chmod 700 /etc/periodic/hourly/pdc
-#   echo -e ""
-# else
-#   echo -e "PDC PERMISSIONS ARE CORRECT, SKIPPING..."
-#   echo -e ""
-# fi
+    ### SET OS-UPDATER PERMISSIONS
+    if [[ "$(stat -c '%a' /etc/periodic/monthly/os-updater)" != 700 ]]; then
+      echo -e "OS-UPDATER PERMISSIONS ARE WRONG, CHANGING..."
+      # chmod 700 /etc/periodic/monthly/os-updater
+      set_permission /etc/periodic/monthly/os-updater 700
+      echo -e ""
+    else
+      echo -e "OS-UPDATER PERMISSIONS ARE CORRECT, SKIPPING..."
+      echo -e ""
+    fi
+  else
+    echo -e "OS-UPDATER LATEST, SKIPPING..."
+  fi
+fi
 
-# ### INSTALL PDC-UPDATER TO CRON (/etc/periodic/15min)
-# echo -e "INSTALLING PDC-UPDATER (/etc/periodic/15min)"
-# curl -L -o /etc/periodic/15min/pdc-updater -H '$HEADER_NO_CACHE' $REPOSITORY_URL/pdc-updater --silent
-# echo -e ""
+### INSTALL PDC
+if [[ ! -f /etc/periodic/hourly/pdc ]]; then
+  echo -e "PDC MISSING, INSTALLING..."
+  curl -sL -o /etc/periodic/hourly/pdc -H '$HEADER_NO_CACHE' $REPOSITORY_URL/scripts/pdc
+  echo -e ""
 
-# ### SET PDC-UPDATER OWNERSHIP
-# if [[ "$(stat -c '%U:%G' /etc/periodic/15min/pdc-updater)" != "root:root" ]]; then
-#   echo -e "PDC-UPDATER OWNERSHIP IS WRONG, CHANGING..."
-#   chown root:root /etc/periodic/15min/pdc-updater
-#   echo -e ""
-# else
-#   echo -e "PDC-UPDATER OWNERSHIP IS CORRECT, SKIPPING..."
-#   echo -e ""
-# fi
+  ### SET PDC OWNERSHIP
+  if [[ "$(stat -c '%U:%G' /etc/periodic/hourly/pdc)" != "root:root" ]]; then
+    echo -e "PDC OWNERSHIP IS WRONG, CHANGING..."
+    set_ownership /etc/periodic/hourly/pdc root
+    echo -e ""
+  else
+    echo -e "PDC OWNERSHIP IS CORRECT, SKIPPING..."
+    echo -e ""
+  fi
 
-# ### SET PDC-UPDATER PERMISSIONS
-# if [[ "$(stat -c '%a' /etc/periodic/15min/pdc-updater)" != 700 ]]; then
-#   echo -e "PDC-UPDATER PERMISSIONS ARE WRONG, CHANGING..."
-#   chmod 700 /etc/periodic/15min/pdc-updater
-#   echo -e ""
-# else
-#   echo -e "PDC-UPDATER PERMISSIONS ARE CORRECT, SKIPPING..."
-#   echo -e ""
-# fi
+  ### SET PDC PERMISSIONS
+  if [[ "$(stat -c '%a' /etc/periodic/hourly/pdc)" != 700 ]]; then
+    echo -e "PDC PERMISSIONS ARE WRONG, CHANGING..."
+    set_permission /etc/periodic/hourly/pdc 700
+    echo -e ""
+  else
+    echo -e "PDC PERMISSIONS ARE CORRECT, SKIPPING..."
+    echo -e ""
+  fi
+else
+  LOCAL_PDC=$(cat /etc/periodic/hourly/pdc | sha256sum | awk '{print $1}')
+  REMOTE_PDC=$(curl -sL -H 'HEADER_NO_CACHE' $REPOSITORY_URL/scripts/pdc | sha256sum | awk '{print $1}')
+
+  if [[ $LOCAL_PDC != $REMOTE_PDC ]]; then
+    echo -e "PDC MISMATCH, UPDATING..."
+    curl -sL -o /etc/periodic/hourly/pdc -H '$HEADER_NO_CACHE' $REPOSITORY_URL/scripts/pdc
+    echo -e ""
+
+    ### SET PDC OWNERSHIP
+    if [[ "$(stat -c '%U:%G' /etc/periodic/hourly/pdc)" != "root:root" ]]; then
+      echo -e "PDC OWNERSHIP IS WRONG, CHANGING..."
+      set_ownership /etc/periodic/hourly/pdc root
+      echo -e ""
+    else
+      echo -e "PDC OWNERSHIP IS CORRECT, SKIPPING..."
+      echo -e ""
+    fi
+
+    ### SET PDC PERMISSIONS
+    if [[ "$(stat -c '%a' /etc/periodic/hourly/pdc)" != 700 ]]; then
+      echo -e "PDC PERMISSIONS ARE WRONG, CHANGING..."
+      set_permission /etc/periodic/hourly/pdc 700
+      echo -e ""
+    else
+      echo -e "PDC PERMISSIONS ARE CORRECT, SKIPPING..."
+      echo -e ""
+    fi
+  else
+    echo -e "PDC LATEST, SKIPPING..."
+  fi
+fi
+
+### INSTALL PDC-UPDATER
+if [[ ! -f /etc/periodic/15min/pdc-updater ]]; then
+  echo -e "PDC-UPDATER MISSING, INSTALLING..."
+  curl -sL -o /etc/periodic/15min/pdc-updater -H '$HEADER_NO_CACHE' $REPOSITORY_URL/scripts/pdc-updater
+  echo -e ""
+
+  ### SET PDC-UPDATER OWNERSHIP
+  if [[ "$(stat -c '%U:%G' /etc/periodic/15min/pdc-updater)" != "root:root" ]]; then
+    echo -e "PDC-UPDATER OWNERSHIP IS WRONG, CHANGING..."
+    # chown root:root /etc/periodic/15min/pdc-updater
+    set_ownership /etc/periodic/15min/pdc-updater root
+    echo -e ""
+  else
+    echo -e "PDC-UPDATER OWNERSHIP IS CORRECT, SKIPPING..."
+    echo -e ""
+  fi
+
+  ### SET PDC-UPDATER PERMISSIONS
+  if [[ "$(stat -c '%a' /etc/periodic/15min/pdc-updater)" != 700 ]]; then
+    echo -e "PDC-UPDATER PERMISSIONS ARE WRONG, CHANGING..."
+    # chmod 700 /etc/periodic/15min/pdc-updater
+    set_permission /etc/periodic/15min/pdc-updater 700
+    echo -e ""
+  else
+    echo -e "PDC-UPDATER PERMISSIONS ARE CORRECT, SKIPPING..."
+    echo -e ""
+  fi
+else
+  LOCAL_OS_UPDATER=$(cat /etc/periodic/15min/pdc-updater | sha256sum | awk '{print $1}')
+  REMOTE_OS_UPDATER=$(curl -sL -H 'HEADER_NO_CACHE' $REPOSITORY_URL/scripts/pdc-updater | sha256sum | awk '{print $1}')
+
+  if [[ $LOCAL_OS_UPDATER != $REMOTE_OS_UPDATER ]]; then
+    echo -e "PDC-UPDATER MISMATCH, UPDATING..."
+    curl -sL -o /etc/periodic/15min/pdc-updater -H '$HEADER_NO_CACHE' $REPOSITORY_URL/scripts/pdc-updater
+    echo -e ""
+
+    ### SET PDC-UPDATER OWNERSHIP
+    if [[ "$(stat -c '%U:%G' /etc/periodic/15min/pdc-updater)" != "root:root" ]]; then
+      echo -e "PDC-UPDATER OWNERSHIP IS WRONG, CHANGING..."
+      # chown root:root /etc/periodic/15min/pdc-updater
+      set_ownership /etc/periodic/15min/pdc-updater root
+      echo -e ""
+    else
+      echo -e "PDC-UPDATER OWNERSHIP IS CORRECT, SKIPPING..."
+      echo -e ""
+    fi
+
+    ### SET PDC-UPDATER PERMISSIONS
+    if [[ "$(stat -c '%a' /etc/periodic/15min/pdc-updater)" != 700 ]]; then
+      echo -e "PDC-UPDATER PERMISSIONS ARE WRONG, CHANGING..."
+      # chmod 700 /etc/periodic/15min/pdc-updater
+      set_permission /etc/periodic/15min/pdc-updater 700
+      echo -e ""
+    else
+      echo -e "PDC-UPDATER PERMISSIONS ARE CORRECT, SKIPPING..."
+      echo -e ""
+    fi
+  else
+    echo -e "PDC-UPDATER LATEST, SKIPPING..."
+  fi
+fi
