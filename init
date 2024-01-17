@@ -29,7 +29,6 @@ echo -e ""
 ### CREATE CONFIG DIRECTORY
 if [[ ! -d /root/.config/alpine-linux-pdc ]]; then
   echo -e "CONFIG DIRECTORY MISSING, CREATING..."
-  #mkdir -p /root/.config/alpine-linux-pdc ### DELETE AFTER VERIFICATION
   create_directory /root/.config/alpine-linux-pdc
   echo -e ""
 else
@@ -40,7 +39,6 @@ fi
 ### SET CONFIG DIRECTORY OWNERSHIP
 if [[ "$(stat -c '%U:%G' /root/.config/alpine-linux-pdc)" != "root:root" ]]; then
   echo -e "CONFIG DIRECTORY OWNERSHIP IS WRONG, CHANGING..."
-  #chown root:root /root/.config/alpine-linux-pdc ### DELETE AFTER VERIFICATION
   set_ownership /root/.config/alpine-linux-pdc root
   echo -e ""
 else
@@ -51,7 +49,6 @@ fi
 ### SET CONFIG DIRECTORY PERMISSIONS
 if [[ "$(stat -c '%a' /root/.config/alpine-linux-pdc)" != 600 ]]; then
   echo -e "CONFIG DIRECTORY PERMISSIONS ARE WRONG, CHANGING..."
-  # chmod 600 /root/.config/alpine-linux-pdc
   set_permission /root/.config/alpine-linux-pdc 600
   echo -e ""
 else
@@ -62,7 +59,6 @@ fi
 ### CREATE EMPTY CONFIG FILE (IF DOESN'T EXIST)
 if [[ ! -f /root/.config/alpine-linux-pdc/config.yaml ]]; then
   echo -e "CONFIG FILE MISSING, CREATING..."
-  # touch /root/.config/alpine-linux-pdc/config.yaml
   create_file /root/.config/alpine-linux-pdc/config.yaml
   echo -e ""
 else
@@ -73,7 +69,6 @@ fi
 ### SET CONFIG FILE OWNERSHIP
 if [[ "$(stat -c '%U:%G' /root/.config/alpine-linux-pdc/config.yaml)" != "root:root" ]]; then
   echo -e "CONFIG FILE OWNERSHIP IS WRONG, CHANGING..."
-  # chown root:root /root/.config/alpine-linux-pdc/config.yaml
   set_ownership /root/.config/alpine-linux-pdc/config.yaml root
   echo -e ""
 else
@@ -84,7 +79,6 @@ fi
 ### SET CONFIG FILE PERMISSIONS
 if [[ "$(stat -c '%a' /root/.config/alpine-linux-pdc/config.yaml)" != 600 ]]; then
   echo -e "CONFIG FILE PERMISSIONS ARE WRONG, CHANGING..."
-  # chmod 600 /root/.config/alpine-linux-pdc/config.yaml
   set_permission /root/.config/alpine-linux-pdc/config.yaml 600
   echo -e ""
 else
@@ -104,7 +98,6 @@ if [[ $LOCAL_ROOT != $REMOTE_ROOT ]]; then
   ### SET CRON FILE OWNERSHIP
   if [[ "$(stat -c '%U:%G' /etc/crontabs/root)" != "root:root" ]]; then
     echo -e "CRON FILE OWNERSHIP IS WRONG, CHANGING..."
-    # chown root:root /etc/crontabs/root
     set_ownership /etc/crontabs/root root
     echo -e ""
   else
@@ -115,7 +108,6 @@ if [[ $LOCAL_ROOT != $REMOTE_ROOT ]]; then
   ### SET CRON FILE PERMISSIONS
   if [[ "$(stat -c '%a' /etc/crontabs/root)" != 600 ]]; then
     echo -e "CRON FILE PERMISSIONS ARE WRONG, CHANGING..."
-    # chmod 600 /etc/crontabs/root
     set_permission /etc/crontabs/root 600
     echo -e ""
   else
@@ -141,7 +133,6 @@ if [[ ! -f /etc/periodic/monthly/os-updater ]]; then
   ### SET OS-UPDATER OWNERSHIP
   if [[ "$(stat -c '%U:%G' /etc/periodic/monthly/os-updater)" != "root:root" ]]; then
     echo -e "OS-UPDATER OWNERSHIP IS WRONG, CHANGING..."
-    # chown root:root /etc/periodic/monthly/os-updater
     set_ownership /etc/periodic/monthly/os-updater root
     echo -e ""
   else
@@ -152,7 +143,6 @@ if [[ ! -f /etc/periodic/monthly/os-updater ]]; then
   ### SET OS-UPDATER PERMISSIONS
   if [[ "$(stat -c '%a' /etc/periodic/monthly/os-updater)" != 700 ]]; then
     echo -e "OS-UPDATER PERMISSIONS ARE WRONG, CHANGING..."
-    # chmod 700 /etc/periodic/monthly/os-updater
     set_permission /etc/periodic/monthly/os-updater 700
     echo -e ""
   else
@@ -171,7 +161,6 @@ else
     ### SET OS-UPDATER OWNERSHIP
     if [[ "$(stat -c '%U:%G' /etc/periodic/monthly/os-updater)" != "root:root" ]]; then
       echo -e "OS-UPDATER OWNERSHIP IS WRONG, CHANGING..."
-      # chown root:root /etc/periodic/monthly/os-updater
       set_ownership /etc/periodic/monthly/os-updater root
       echo -e ""
     else
@@ -182,7 +171,6 @@ else
     ### SET OS-UPDATER PERMISSIONS
     if [[ "$(stat -c '%a' /etc/periodic/monthly/os-updater)" != 700 ]]; then
       echo -e "OS-UPDATER PERMISSIONS ARE WRONG, CHANGING..."
-      # chmod 700 /etc/periodic/monthly/os-updater
       set_permission /etc/periodic/monthly/os-updater 700
       echo -e ""
     else
@@ -263,7 +251,6 @@ if [[ ! -f /etc/periodic/15min/pdc-updater ]]; then
   ### SET PDC-UPDATER OWNERSHIP
   if [[ "$(stat -c '%U:%G' /etc/periodic/15min/pdc-updater)" != "root:root" ]]; then
     echo -e "PDC-UPDATER OWNERSHIP IS WRONG, CHANGING..."
-    # chown root:root /etc/periodic/15min/pdc-updater
     set_ownership /etc/periodic/15min/pdc-updater root
     echo -e ""
   else
@@ -274,7 +261,6 @@ if [[ ! -f /etc/periodic/15min/pdc-updater ]]; then
   ### SET PDC-UPDATER PERMISSIONS
   if [[ "$(stat -c '%a' /etc/periodic/15min/pdc-updater)" != 700 ]]; then
     echo -e "PDC-UPDATER PERMISSIONS ARE WRONG, CHANGING..."
-    # chmod 700 /etc/periodic/15min/pdc-updater
     set_permission /etc/periodic/15min/pdc-updater 700
     echo -e ""
   else
@@ -293,7 +279,6 @@ else
     ### SET PDC-UPDATER OWNERSHIP
     if [[ "$(stat -c '%U:%G' /etc/periodic/15min/pdc-updater)" != "root:root" ]]; then
       echo -e "PDC-UPDATER OWNERSHIP IS WRONG, CHANGING..."
-      # chown root:root /etc/periodic/15min/pdc-updater
       set_ownership /etc/periodic/15min/pdc-updater root
       echo -e ""
     else
@@ -304,7 +289,6 @@ else
     ### SET PDC-UPDATER PERMISSIONS
     if [[ "$(stat -c '%a' /etc/periodic/15min/pdc-updater)" != 700 ]]; then
       echo -e "PDC-UPDATER PERMISSIONS ARE WRONG, CHANGING..."
-      # chmod 700 /etc/periodic/15min/pdc-updater
       set_permission /etc/periodic/15min/pdc-updater 700
       echo -e ""
     else
