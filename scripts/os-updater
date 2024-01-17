@@ -1,0 +1,10 @@
+#!/bin/bash
+
+### UPDATE PACKAGES/OS
+apk upgrade -U --quiet
+
+### SLEEP
+sleep 60
+
+### REBOOT
+reboot
