@@ -6,6 +6,38 @@ CONFIG="/root/.config/alpine-linux-pdc/config.yaml"
 ### APK REPOSITORIES
 echo -e "### CONTROLLED BY PDC\n\n#/media/sdb1/apks\nhttp://dl-cdn.alpinelinux.org/alpine/v3.19/main\nhttp://dl-cdn.alpinelinux.org/alpine/v3.19/community\n" > /etc/apk/repositories
 
+LOCAL_APK_REPOSITORIES=$(cat /etc/apk/repositories | sha256sum | awk '{print $1}')
+REMOTE_APK_REPOSITORIES=$(curl -sL -H 'HEADER_NO_CACHE' $REPOSITORY_URL/templates/apk/repositories | sha256sum | awk '{print $1}')
+
+if [[ $LOCAL_APK_REPOSITORIES != $REMOTE_APK_REPOSITORIES ]]; then
+  echo -e "APK REPOSITORIES MISMATCH, UPDATING..."
+  curl -sL -o /etc/apk/repositories -H '$HEADER_NO_CACHE' $REPOSITORY_URL/templates/apk/repositories
+  echo -e ""
+
+  ### SET APK REPOSITORIES FILE OWNERSHIP
+  if [[ "$(stat -c '%U:%G' /etc/apk/repositories)" != "root:root" ]]; then
+    echo -e "APK REPOSITORIES OWNERSHIP IS WRONG, CHANGING..."
+    set_ownership /etc/apk/repositories root
+    echo -e ""
+  else
+    echo -e "APK REPOSITORIES OWNERSHIP IS CORRECT, SKIPPING..."
+    echo -e ""
+  fi
+
+  ### SET APK REPOSITORIES FILE PERMISSIONS
+  if [[ "$(stat -c '%a' /etc/apk/repositories)" != 600 ]]; then
+    echo -e "APK REPOSITORIES FILE PERMISSIONS ARE WRONG, CHANGING..."
+    set_permission /etc/apk/repositories 644
+    echo -e ""
+  else
+    echo -e "APK REPOSITORIES FILE PERMISSIONS ARE CORRECT, SKIPPING..."
+    echo -e ""
+  fi
+else
+  echo -e "APK REPOSITORIES FILE LATEST, SKIPPING..."
+  echo -e ""
+fi
+
 ### DRIVERS MODULE
 echo -e "### DRIVERS MODULE - START ###"
 if [[ $(yq eval '.system.drivers.amd // false' $CONFIG) == true ]]; then
