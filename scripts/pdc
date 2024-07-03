@@ -157,7 +157,6 @@ echo -e "### TAILSCALE MODULE - STOP ###"
 ### DOCKER MODULE
 echo -e "### DOCKER MODULE - START ###"
 if [[ $(yq eval '.system.docker.enabled // false' $CONFIG) == true ]]; then
-  ### INSTALL DOCKER
   if [[ -z "$(which docker)" ]]; then
     ### INSTALL DOCKER
     echo -e "INSTALLING DOCKER"
@@ -172,6 +171,15 @@ if [[ $(yq eval '.system.docker.enabled // false' $CONFIG) == true ]]; then
     rc-service docker start
   else
     echo -e "DOCKER IS ALREADY INSTALLED, SKIPPING..."
+  fi
+
+  ### INSTALL DOCKER COMPOSE
+  if [[ -z $(apk list --installed | grep docker-cli-compose) ]]; then
+    ### INSTALL DOCKER COMPOSE
+    echo -e "INSTALLING DOCKER COMPOSE"
+    apk add -U docker-cli-compose --quiet
+  else
+    echo -e "DOCKER COMPOSE IS ALREADY INSTALLED, SKIPPING..."
   fi
 
   ### ADD DOCKER GROUP TO USER
