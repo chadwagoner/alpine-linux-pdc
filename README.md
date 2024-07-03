@@ -26,6 +26,12 @@ curl -sL -H 'Cache-Control: no-cache, no-store' https://raw.githubusercontent.co
 
 ```yaml
 system:
+  docker:
+    enabled: (true/false)             [default: false]
+    ingress: 
+      enabled: (true/false)           [default: false]
+      traefik: (true/false)           [default: false]
+    user: (string)                    [default: ""]
   drivers:
     amd: (true/false)                 [default: false]
     intel: (true/false)               [default: false]
@@ -39,18 +45,8 @@ system:
     enabled: (true/false)             [default: false]
     exit: (true/false)                [default: false]
     subnet: (true/false)              [default: false]
-docker:
-  enabled: (true/false)               [default: false]
-  containers:
-    portainer: (true/false)           [default: false]
-  ingress: 
+  ufw:
     enabled: (true/false)             [default: false]
-    traefik: (true/false)             [default: false]
-  user: (string)                      [default: ""]
-neofetch:
-  enabled: (true/false)               [default: false]
-ufw:
-  enabled: (true/false)               [default: false]
 ```
 
 ## APP SPECIFIC CONFIGURATION
@@ -90,3 +86,21 @@ Add the following parameter for subnet routing
 ```bash
 --advertise-routes=<ip-address-range>
 ```
+
+## MISC
+
+### GIT COMMIT MESSAGE TYPES [[REFERENCE]](https://www.conventionalcommits.org/en/v1.0.0/)
+
+* build: Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)
+* ci: Changes to our CI configuration files and scripts (example scopes: Travis, Circle, BrowserStack, SauceLabs)
+* docs: Documentation only changes
+* feat: A new feature
+* fix: A bug fix
+* perf: A code change that improves performance
+* refactor: A code change that neither fixes a bug nor adds a feature
+* style: Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
+* test: Adding missing tests or correcting existing tests
+
+#### EXAMPLE
+
+* `<type>[optional scope]: <description>`

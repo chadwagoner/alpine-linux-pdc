@@ -3,9 +3,24 @@
 ### GLOBAL VARIABLES
 CONFIG="/root/.config/alpine-linux-pdc/config.yaml"
 
-### APK REPOSITORIES
-echo -e "### CONTROLLED BY PDC\n\n#/media/sdb1/apks\nhttp://dl-cdn.alpinelinux.org/alpine/v3.19/main\nhttp://dl-cdn.alpinelinux.org/alpine/v3.19/community\n" > /etc/apk/repositories
+### GLOBAL FUNCTIONS
+create_directory () {
+  mkdir -p $1
+}
 
+create_file () {
+  touch $1
+}
+
+set_ownership () {
+  chown $2:$2 $1
+}
+
+set_permission () {
+  chmod $2 $1
+}
+
+### APK REPOSITORIES
 LOCAL_APK_REPOSITORIES=$(cat /etc/apk/repositories | sha256sum | awk '{print $1}')
 REMOTE_APK_REPOSITORIES=$(curl -sL -H 'HEADER_NO_CACHE' $REPOSITORY_URL/templates/apk/repositories | sha256sum | awk '{print $1}')
 
@@ -123,7 +138,6 @@ if [[ $(yq eval '.system.tailscale.enabled // false' $CONFIG) == true ]]; then
   fi
 
   if [[ $(yq eval '.system.tailscale.exit // false' $CONFIG) == true ]] || [[ $(yq eval '.system.tailscale.subnet // false' $CONFIG) == true ]]; then
-    ### CREATE 99-TAILSCALE.CONF FILE
     if [[ ! -f /etc/sysctl.d/99-tailscale.conf ]]; then
       echo -e "99-TAILSCALE.CONF MISSING, CREATING..."
       echo -e "net.ipv4.ip_forward = 1\nnet.ipv6.conf.all.forwarding = 1" > /etc/sysctl.d/99-tailscale.conf
@@ -142,7 +156,7 @@ echo -e "### TAILSCALE MODULE - STOP ###"
 
 ### DOCKER MODULE
 echo -e "### DOCKER MODULE - START ###"
-if [[ $(yq eval '.docker.enabled // false' $CONFIG) == true ]]; then
+if [[ $(yq eval '.system.docker.enabled // false' $CONFIG) == true ]]; then
   ### INSTALL DOCKER
   if [[ -z "$(which docker)" ]]; then
     ### INSTALL DOCKER
@@ -161,21 +175,21 @@ if [[ $(yq eval '.docker.enabled // false' $CONFIG) == true ]]; then
   fi
 
   ### ADD DOCKER GROUP TO USER
-  if [[ -n $(yq eval '.docker.user // ""' $CONFIG) ]]; then
-    if [[ -z $(groups alpine | grep docker) ]]; then
+  if [[ -n $(yq eval '.system.docker.user // ""' $CONFIG) ]]; then
+    if [[ -z $(groups $(yq eval '.system.docker.user // ""' $CONFIG) | grep docker) ]]; then
       ### ADD DOCKER GROUP TO USER
-      echo -e "ADDING DOCKER GROUP TO $(yq eval '.docker.user // ""' $CONFIG)"
-      addgroup $(yq eval '.docker.user // ""' $CONFIG) docker
+      echo -e "ADDING DOCKER GROUP TO $(yq eval '.system.docker.user // ""' $CONFIG)"
+      addgroup $(yq eval '.system.docker.user // ""' $CONFIG) docker
     else
       ### DOCKER GROUP EXISTS FOR USER
-      echo -e "DOCKER GROUP EXISTS FOR $(yq eval '.docker.user // ""' $CONFIG), SKIPPING..."
+      echo -e "DOCKER GROUP EXISTS FOR $(yq eval '.system.docker.user // ""' $CONFIG), SKIPPING..."
     fi
   else
     echo -e "DOCKER.USER IS NULL, SKIPPING..."
   fi
 
   ### INGRESS PROXY NETWORK
-  if [[ $(yq eval '.docker.ingress.enabled // false' $CONFIG) == true ]]; then
+  if [[ $(yq eval '.system.docker.ingress.enabled // false' $CONFIG) == true ]]; then
     if [[ -z "$(docker network list --filter 'name=proxy' --quiet)" ]]; then
       echo -e "CREATING PROXY NETWORK"
       docker network create proxy
@@ -187,7 +201,7 @@ if [[ $(yq eval '.docker.enabled // false' $CONFIG) == true ]]; then
   fi
 
   ### SETUP TRAEFIK
-  if [[ $(yq eval '.docker.ingress.traefik // false' $CONFIG) == true ]]; then
+  if [[ $(yq eval '.system.docker.ingress.traefik // false' $CONFIG) == true ]]; then
     ### CREATE TRAEFIK DIRECTORY (IF DOESN'T EXIST)
     if [[ ! -d /root/.config/traefik ]]; then
       echo -e "TRAEFIK DIRECTORY MISSING, CREATING..."
@@ -240,7 +254,7 @@ if [[ $(yq eval '.docker.enabled // false' $CONFIG) == true ]]; then
   fi
 
   ### INSTALL PORTAINER
-  if [[ $(yq eval '.docker.containers.portainer // false' $CONFIG) == true ]]; then
+  if [[ $(yq eval '.system.docker.containers.portainer // false' $CONFIG) == true ]]; then
     if [[ -z "$(docker container list --filter 'name=portainer' --quiet)" ]]; then
       if [[ -z "$(docker volume list --filter 'name=portainer_data' --quiet)" ]]; then
         ### CREATE PORTAINER_DATA VOLUME
@@ -263,7 +277,5 @@ else
   echo -e "DOCKER.ENABLED IS FALSE, SKIPPING..."
 fi
 echo -e "### DOCKER MODULE - STOP ###"
-
-### NEOFETCH MODULE
 
 ### UFW MODULE

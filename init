@@ -23,7 +23,7 @@ set_permission () {
 
 ### INSTALL REQUIRED BASE PACKAGES
 echo -e "INSTALLING BASE PACKAGES"
-apk add -U curl lm-sensors ncurses pciutils yq --quiet
+apk add -U curl lm-sensors ncurses yq --quiet
 echo -e ""
 
 ### CREATE CONFIG DIRECTORY
@@ -56,7 +56,7 @@ else
   echo -e ""
 fi
 
-### CREATE EMPTY CONFIG FILE (IF DOESN'T EXIST)
+### CREATE CONFIG FILE
 if [[ ! -f /root/.config/alpine-linux-pdc/config.yaml ]]; then
   echo -e "CONFIG FILE MISSING, CREATING..."
   create_file /root/.config/alpine-linux-pdc/config.yaml
@@ -268,10 +268,10 @@ if [[ ! -f /etc/periodic/15min/pdc-updater ]]; then
     echo -e ""
   fi
 else
-  LOCAL_OS_UPDATER=$(cat /etc/periodic/15min/pdc-updater | sha256sum | awk '{print $1}')
-  REMOTE_OS_UPDATER=$(curl -sL -H 'HEADER_NO_CACHE' $REPOSITORY_URL/scripts/pdc-updater | sha256sum | awk '{print $1}')
+  LOCAL_PDC_UPDATER=$(cat /etc/periodic/15min/pdc-updater | sha256sum | awk '{print $1}')
+  REMOTE_PDC_UPDATER=$(curl -sL -H 'HEADER_NO_CACHE' $REPOSITORY_URL/scripts/pdc-updater | sha256sum | awk '{print $1}')
 
-  if [[ $LOCAL_OS_UPDATER != $REMOTE_OS_UPDATER ]]; then
+  if [[ $LOCAL_PDC_UPDATER != $REMOTE_PDC_UPDATER ]]; then
     echo -e "PDC-UPDATER MISMATCH, UPDATING..."
     curl -sL -o /etc/periodic/15min/pdc-updater -H '$HEADER_NO_CACHE' $REPOSITORY_URL/scripts/pdc-updater
     echo -e ""
