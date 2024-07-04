@@ -28,9 +28,7 @@ curl -sL -H 'Cache-Control: no-cache, no-store' https://raw.githubusercontent.co
 system:
   docker:
     enabled: (true/false)             [default: false]
-    ingress: 
-      enabled: (true/false)           [default: false]
-      traefik: (true/false)           [default: false]
+    ingress: (true/false)             [default: false]
     user: (string)                    [default: ""]
   drivers:
     amd: (true/false)                 [default: false]
@@ -45,6 +43,7 @@ system:
     enabled: (true/false)             [default: false]
     exit: (true/false)                [default: false]
     subnet: (true/false)              [default: false]
+    tailnet: (string)                 [default: ""]
   ufw:
     enabled: (true/false)             [default: false]
 ```
