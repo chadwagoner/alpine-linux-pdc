@@ -332,7 +332,7 @@ if [[ $(yq eval '.services.traefik.enabled // false' $CONFIG) == true ]] && [[ $
       echo -e "TRAEFIK COMPOSE EXISTS, SKIPPING..."
     fi
 
-    if [[ -f /root/.config/services/traefik/.env ]]; then
+    if [[ ! -f /root/.config/services/traefik/.env ]]; then
       echo -e ".ENV MISSING, INSTALLING..."
       create_file /root/.config/services/traefik/.env
       echo -e ""
@@ -358,13 +358,13 @@ if [[ $(yq eval '.services.traefik.enabled // false' $CONFIG) == true ]] && [[ $
       fi
 
       echo -e "POPULATING .ENV"
-      yq --output-format props eval '.services.traefik.required_env // ""' > /root/.config/services/traefik/.env
+      yq --output-format props eval '.services.traefik.required_env' $CONFIG > /root/.config/services/traefik/.env
       echo -e ""
     else
       echo -e ".ENV EXISTS, SKIPPING..."
     fi
 
-    if [[ -f /root/.config/services/traefik/acme.json ]]; then
+    if [[ ! -f /root/.config/services/traefik/acme.json ]]; then
       echo -e "ACME.JSON MISSING, INSTALLING..."
       create_file /root/.config/services/traefik/acme.json
       echo -e ""
@@ -392,7 +392,7 @@ if [[ $(yq eval '.services.traefik.enabled // false' $CONFIG) == true ]] && [[ $
       echo -e "ACME.JSON EXISTS, SKIPPING..."
     fi
 
-    if [[ -f /root/.config/services/traefik/config.yml ]]; then
+    if [[ ! -f /root/.config/services/traefik/config.yml ]]; then
       echo -e "CONFIG.YML MISSING, INSTALLING..."
       create_file /root/.config/services/traefik/config.yml
       echo -e ""
@@ -418,7 +418,7 @@ if [[ $(yq eval '.services.traefik.enabled // false' $CONFIG) == true ]] && [[ $
       fi
 
       echo -e "POPULATING CONFIG.YML"
-      yq eval '.services.traefik.custom_config // ""' > /root/.config/services/traefik/config.yml
+      yq eval '.services.traefik.custom_config' $CONFIG > /root/.config/services/traefik/config.yml
       echo -e ""
     else
       echo -e "CONFIG.YML EXISTS, SKIPPING..."

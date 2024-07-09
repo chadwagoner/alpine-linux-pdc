@@ -23,7 +23,7 @@ set_permission () {
 
 ### UPDATE PDC
 LOCAL_PDC=$(cat /etc/periodic/hourly/pdc | sha256sum | awk '{print $1}')
-REMOTE_PDC=$(curl -sL -H 'HEADER_NO_CACHE' $REPOSITORY_URL/scripts/pdc | sha256sum | awk '{print $1}')
+REMOTE_PDC=$(curl -sL -H '$HEADER_NO_CACHE' $REPOSITORY_URL/scripts/pdc | sha256sum | awk '{print $1}')
 
 if [[ $LOCAL_PDC != $REMOTE_PDC ]]; then
   echo -e "PDC MISMATCH, UPDATING..."
