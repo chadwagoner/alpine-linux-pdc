@@ -1,6 +1,8 @@
 #!/bin/bash
 
 ### GLOBAL VARIABLES
+REPOSITORY_URL="https://raw.githubusercontent.com/chadwagoner/alpine-linux-pdc/main"
+HEADER_NO_CACHE="Cache-Control: no-cache, no-store"
 CONFIG="/root/.config/alpine-linux-pdc/config.yaml"
 
 ### GLOBAL FUNCTIONS
@@ -22,7 +24,7 @@ set_permission () {
 
 ### APK REPOSITORIES
 LOCAL_APK_REPOSITORIES=$(cat /etc/apk/repositories | sha256sum | awk '{print $1}')
-REMOTE_APK_REPOSITORIES=$(curl -sL -H 'HEADER_NO_CACHE' $REPOSITORY_URL/templates/apk/repositories | sha256sum | awk '{print $1}')
+REMOTE_APK_REPOSITORIES=$(curl -sL -H '$HEADER_NO_CACHE' $REPOSITORY_URL/templates/apk/repositories | sha256sum | awk '{print $1}')
 
 if [[ $LOCAL_APK_REPOSITORIES != $REMOTE_APK_REPOSITORIES ]]; then
   echo -e "APK REPOSITORIES MISMATCH, UPDATING..."
@@ -287,3 +289,148 @@ fi
 echo -e "### DOCKER MODULE - STOP ###"
 
 ### UFW MODULE
+
+### SERVICES
+
+##### TRAEFIK
+echo -e "### SERVICES.TRAEFIK - START ###"
+if [[ $(yq eval '.services.traefik.enabled // false' $CONFIG) == true ]] && [[ $(yq eval '.system.docker.ingress // false' $CONFIG) == true ]]; then
+  if [[ -z "$(docker container list --filter 'name=traefik' --quiet)" ]]; then
+    if [[ ! -d /root/.config/services/traefik ]]; then
+      echo -e "TRAEFIK DIRECTORY MISSING, CREATING..."
+      create_directory /root/.config/services/traefik
+      echo -e ""
+    else
+      echo -e "TRAEFIK DIRECTORY EXISTS, SKIPPING..."
+    fi
+
+    if [[ ! -f /root/.config/services/traefik/compose.yml ]]; then
+      echo -e "TRAEFIK COMPOSE MISSING, INSTALLING..."
+      curl -sL -o /root/.config/services/traefik/compose.yml -H '$HEADER_NO_CACHE' $REPOSITORY_URL/services/traefik/compose.digitalocean.yml
+      echo -e ""
+
+      ### SET TRAEFIK COMPOSE OWNERSHIP
+      if [[ "$(stat -c '%U:%G' /root/.config/services/traefik/compose.yml)" != "root:root" ]]; then
+        echo -e "TRAEFIK COMPOSE OWNERSHIP IS WRONG, CHANGING..."
+        set_ownership /root/.config/services/traefik/compose.yml root
+        echo -e ""
+      else
+        echo -e "TRAEFIK COMPOSE OWNERSHIP IS CORRECT, SKIPPING..."
+        echo -e ""
+      fi
+
+      ### SET TRAEFIK COMPOSE PERMISSIONS
+      if [[ "$(stat -c '%a' /root/.config/services/traefik/compose.yml)" != 700 ]]; then
+        echo -e "TRAEFIK COMPOSE PERMISSIONS ARE WRONG, CHANGING..."
+        set_permission /root/.config/services/traefik/compose.yml 700
+        echo -e ""
+      else
+        echo -e "TRAEFIK COMPOSE PERMISSIONS ARE CORRECT, SKIPPING..."
+        echo -e ""
+      fi
+    else
+      echo -e "TRAEFIK COMPOSE EXISTS, SKIPPING..."
+    fi
+
+    if [[ -f /root/.config/services/traefik/.env ]]; then
+      echo -e ".ENV MISSING, INSTALLING..."
+      create_file /root/.config/services/traefik/.env
+      echo -e ""
+
+      ### SET .ENV OWNERSHIP
+      if [[ "$(stat -c '%U:%G' /root/.config/services/traefik/.env)" != "root:root" ]]; then
+        echo -e ".ENV OWNERSHIP IS WRONG, CHANGING..."
+        set_ownership /root/.config/services/traefik/.env root
+        echo -e ""
+      else
+        echo -e ".ENV OWNERSHIP IS CORRECT, SKIPPING..."
+        echo -e ""
+      fi
+
+      ### SET .ENV PERMISSIONS
+      if [[ "$(stat -c '%a' /root/.config/services/traefik/.env)" != 600 ]]; then
+        echo -e ".ENV PERMISSIONS ARE WRONG, CHANGING..."
+        set_permission /root/.config/services/traefik/.env 600
+        echo -e ""
+      else
+        echo -e ".ENV PERMISSIONS ARE CORRECT, SKIPPING..."
+        echo -e ""
+      fi
+
+      echo -e "POPULATING .ENV"
+      yq --output-format props eval '.services.traefik.required_env // ""' > /root/.config/services/traefik/.env
+      echo -e ""
+    else
+      echo -e ".ENV EXISTS, SKIPPING..."
+    fi
+
+    if [[ -f /root/.config/services/traefik/acme.json ]]; then
+      echo -e "ACME.JSON MISSING, INSTALLING..."
+      create_file /root/.config/services/traefik/acme.json
+      echo -e ""
+
+      ### SET ACME.JSON OWNERSHIP
+      if [[ "$(stat -c '%U:%G' /root/.config/services/traefik/acme.json)" != "root:root" ]]; then
+        echo -e "ACME.JSON OWNERSHIP IS WRONG, CHANGING..."
+        set_ownership /root/.config/services/traefik/acme.json root
+        echo -e ""
+      else
+        echo -e "ACME.JSON OWNERSHIP IS CORRECT, SKIPPING..."
+        echo -e ""
+      fi
+
+      ### SET ACME.JSON PERMISSIONS
+      if [[ "$(stat -c '%a' /root/.config/services/traefik/acme.json)" != 600 ]]; then
+        echo -e "ACME.JSON PERMISSIONS ARE WRONG, CHANGING..."
+        set_permission /root/.config/services/traefik/acme.json 600
+        echo -e ""
+      else
+        echo -e "ACME.JSON PERMISSIONS ARE CORRECT, SKIPPING..."
+        echo -e ""
+      fi
+    else
+      echo -e "ACME.JSON EXISTS, SKIPPING..."
+    fi
+
+    if [[ -f /root/.config/services/traefik/config.yml ]]; then
+      echo -e "CONFIG.YML MISSING, INSTALLING..."
+      create_file /root/.config/services/traefik/config.yml
+      echo -e ""
+
+      ### SET CONFIG.YML OWNERSHIP
+      if [[ "$(stat -c '%U:%G' /root/.config/services/traefik/config.yml)" != "root:root" ]]; then
+        echo -e "CONFIG.YML OWNERSHIP IS WRONG, CHANGING..."
+        set_ownership /root/.config/services/traefik/config.yml root
+        echo -e ""
+      else
+        echo -e "CONFIG.YML OWNERSHIP IS CORRECT, SKIPPING..."
+        echo -e ""
+      fi
+
+      ### SET CONFIG.YML PERMISSIONS
+      if [[ "$(stat -c '%a' /root/.config/services/traefik/config.yml)" != 700 ]]; then
+        echo -e "CONFIG.YML PERMISSIONS ARE WRONG, CHANGING..."
+        set_permission /root/.config/services/traefik/config.yml 700
+        echo -e ""
+      else
+        echo -e "CONFIG.YML PERMISSIONS ARE CORRECT, SKIPPING..."
+        echo -e ""
+      fi
+
+      echo -e "POPULATING CONFIG.YML"
+      yq eval '.services.traefik.custom_config // ""' > /root/.config/services/traefik/config.yml
+      echo -e ""
+    else
+      echo -e "CONFIG.YML EXISTS, SKIPPING..."
+    fi
+
+    echo -e "TRAEFIK CONTAINER STARTING"
+    docker compose up --detach --file /root/.config/services/traefik/compose.yml
+    echo -e ""
+  else
+    echo -e "TRAEFIK CONTAINER EXISTS, SKIPPING..."
+  fi
+else
+  echo -e "SERVICES.TRAEFIK.ENABLED IS FALSE, SKIPPING..."
+fi
+echo -e "### SERVICES.TRAEFIK - STOP ###"

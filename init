@@ -88,7 +88,7 @@ fi
 
 ### UPDATE CRON SCHEDULES
 LOCAL_ROOT=$(cat /etc/crontabs/root | sha256sum | awk '{print $1}')
-REMOTE_ROOT=$(curl -sL -H 'HEADER_NO_CACHE' $REPOSITORY_URL/templates/crontab/root | sha256sum | awk '{print $1}')
+REMOTE_ROOT=$(curl -sL -H '$HEADER_NO_CACHE' $REPOSITORY_URL/templates/crontab/root | sha256sum | awk '{print $1}')
 
 if [[ $LOCAL_ROOT != $REMOTE_ROOT ]]; then
   echo -e "CRON FILE MISMATCH, UPDATING..."
@@ -151,7 +151,7 @@ if [[ ! -f /etc/periodic/monthly/os-updater ]]; then
   fi
 else
   LOCAL_OS_UPDATER=$(cat /etc/periodic/monthly/os-updater | sha256sum | awk '{print $1}')
-  REMOTE_OS_UPDATER=$(curl -sL -H 'HEADER_NO_CACHE' $REPOSITORY_URL/scripts/os-updater | sha256sum | awk '{print $1}')
+  REMOTE_OS_UPDATER=$(curl -sL -H '$HEADER_NO_CACHE' $REPOSITORY_URL/scripts/os-updater | sha256sum | awk '{print $1}')
 
   if [[ $LOCAL_OS_UPDATER != $REMOTE_OS_UPDATER ]]; then
     echo -e "OS-UPDATER MISMATCH, UPDATING..."
@@ -210,7 +210,7 @@ if [[ ! -f /etc/periodic/hourly/pdc ]]; then
   fi
 else
   LOCAL_PDC=$(cat /etc/periodic/hourly/pdc | sha256sum | awk '{print $1}')
-  REMOTE_PDC=$(curl -sL -H 'HEADER_NO_CACHE' $REPOSITORY_URL/scripts/pdc | sha256sum | awk '{print $1}')
+  REMOTE_PDC=$(curl -sL -H '$HEADER_NO_CACHE' $REPOSITORY_URL/scripts/pdc | sha256sum | awk '{print $1}')
 
   if [[ $LOCAL_PDC != $REMOTE_PDC ]]; then
     echo -e "PDC MISMATCH, UPDATING..."
@@ -269,7 +269,7 @@ if [[ ! -f /etc/periodic/15min/pdc-updater ]]; then
   fi
 else
   LOCAL_PDC_UPDATER=$(cat /etc/periodic/15min/pdc-updater | sha256sum | awk '{print $1}')
-  REMOTE_PDC_UPDATER=$(curl -sL -H 'HEADER_NO_CACHE' $REPOSITORY_URL/scripts/pdc-updater | sha256sum | awk '{print $1}')
+  REMOTE_PDC_UPDATER=$(curl -sL -H '$HEADER_NO_CACHE' $REPOSITORY_URL/scripts/pdc-updater | sha256sum | awk '{print $1}')
 
   if [[ $LOCAL_PDC_UPDATER != $REMOTE_PDC_UPDATER ]]; then
     echo -e "PDC-UPDATER MISMATCH, UPDATING..."

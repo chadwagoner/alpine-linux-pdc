@@ -25,6 +25,16 @@ curl -sL -H 'Cache-Control: no-cache, no-store' https://raw.githubusercontent.co
 ### VALUES
 
 ```yaml
+services:
+  traefik:
+    enabled: (true/false)             [default: false]
+    custom_config:
+    required_env:
+      ADMIN_CREDS: (string)           [default: ""]
+      DO_AUTH_TOKEN: (string)         [default: ""]
+      DOMAIN: (string)                [default: ""]
+      EMAIL: (string)                 [default: ""]
+      SUBDOMAIN: (string)             [default: ""]
 system:
   docker:
     enabled: (true/false)             [default: false]
@@ -88,6 +98,39 @@ Add the following parameter for subnet routing
 
 ## MISC
 
+### DEVELOPMENT
+
+#### MAC
+
+```
+brew install macpine
+```
+
+Create, Update, and fix Grub
+
+```
+alpine launch --name dev --mount $(pwd) && \
+alpine exec dev 'echo -e "### CONTROLLED BY PDC\n\nhttp://dl-cdn.alpinelinux.org/alpine/v3.20/main\nhttp://dl-cdn.alpinelinux.org/alpine/v3.20/community" > /etc/apk/repositories && apk upgrade -U && apk add -U bash chrony curl && rc-update add chronyd && service chronyd start && grub-install --target=arm64-efi --efi-directory=/boot/efi --bootloader-id=alpine --boot-directory=/boot --no-nvram && install -D /boot/efi/EFI/alpine/grubaa64.efi /boot/efi/EFI/boot/bootaa64.efi && reboot' && \
+sleep 10 && \
+alpine ssh dev
+```
+
+Issues with mounting directory? Run this...
+
+```
+alpine exec dev 'mount -t 9p -o trans=virtio,version=9p2000.L,msize=104857600 host0 /mnt/alpine-linux-pdc'
+```
+
+Cleanup
+
+```
+alpine delete dev
+```
+
+#### REFERENCES
+* [GITHUB](https://github.com/beringresearch/macpine)
+* [GRUB FIX](https://wiki.alpinelinux.org/wiki/Release_Notes_for_Alpine_3.20.0#grub_2.12)
+
 ### GIT COMMIT MESSAGE TYPES [[REFERENCE]](https://www.conventionalcommits.org/en/v1.0.0/)
 
 * build: Changes that affect the build system or external dependencies (example scopes: gulp, broccoli, npm)
@@ -103,3 +146,6 @@ Add the following parameter for subnet routing
 #### EXAMPLE
 
 * `<type>[optional scope]: <description>`
+
+apk update; apk add chrony
+service chronyd start

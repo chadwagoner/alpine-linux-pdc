@@ -1,0 +1,54 @@
+services:
+  traefik:
+    image: traefik:latest
+    container_name: traefik
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - proxy
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      DO_AUTH_TOKEN: ${DO_API_TOKEN}
+      TRAEFIK_API: true
+      TRAEFIK_API_DASHBOARD: true
+      TRAEFIK_API_DEBUG: true
+      TRAEFIK_CERTIFICATESRESOLVERS_DIGITALOCEAN_ACME_DNSCHALLENGE_PROVIDER: "digitalocean"
+      TRAEFIK_CERTIFICATESRESOLVERS_DIGITALOCEAN_ACME_DNSCHALLENGE_RESOLVERS: 1.1.1.1:53, 1.0.0.1:53
+      TRAEFIK_CERTIFICATESRESOLVERS_DIGITALOCEAN_ACME_EMAIL: ${EMAIL}
+      TRAEFIK_CERTIFICATESRESOLVERS_DIGITALOCEAN_ACME_STORAGE: "/acme.json"
+      TRAEFIK_ENTRYPOINTS_HTTP_ADDRESS: ":80"
+      TRAEFIK_ENTRYPOINTS_HTTP_HTTP_REDIRECTIONS_ENTRYPOINT_SCHEME: "https"
+      TRAEFIK_ENTRYPOINTS_HTTP_HTTP_REDIRECTIONS_ENTRYPOINT_TO: "https"
+      TRAEFIK_ENTRYPOINTS_HTTPS_ADDRESS: ":443"
+      TRAEFIK_PROVIDERS_DOCKER: true
+      TRAEFIK_PROVIDERS_DOCKER_EXPOSEDBYDEFAULT: false
+      TRAEFIK_PROVIDERS_FILE_FILENAME: "/config.yml"
+      TRAEFIK_SERVERSTRANSPORT_INSECURESKIPVERIFY: true
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /root/.config/services/traefik/acme.json:/acme.json
+      - /root/.config/services/traefik/config.yml:/config.yml:ro
+    labels:
+      traefik.enable: true
+      traefik.http.routers.traefik.entrypoints: "http"
+      traefik.http.routers.traefik.rule: "Host(`traefik.${SUBDOMAIN}.${DOMAIN}`)"
+      traefik.http.middlewares.traefik-auth.basicauth.users: "${ADMIN_CREDS}"
+      traefik.http.middlewares.traefik-https-redirect.redirectscheme.scheme: "https"
+      traefik.http.middlewares.sslheader.headers.customrequestheaders.X-Forwarded-Proto: "https"
+      traefik.http.routers.traefik.middlewares: "traefik-https-redirect"
+      traefik.http.routers.traefik-secure.entrypoints: "https"
+      traefik.http.routers.traefik-secure.rule: "Host(`traefik.${SUBDOMAIN}.${DOMAIN}`)"
+      traefik.http.routers.traefik-secure.middlewares: "traefik-auth"
+      traefik.http.routers.traefik-secure.tls: true
+      traefik.http.routers.traefik-secure.tls.certresolver: "digitalocean"
+      traefik.http.routers.traefik-secure.tls.domains[0].main: "${SUBDOMAIN}.${DOMAIN}"
+      traefik.http.routers.traefik-secure.tls.domains[0].sans: "*.${SUBDOMAIN}.${DOMAIN}"
+      traefik.http.routers.traefik-secure.service: "api@internal"
+
+networks:
+  proxy:
+    external: true
