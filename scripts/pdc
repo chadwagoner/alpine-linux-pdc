@@ -343,6 +343,57 @@ else
 fi
 echo -e "### SERVICES.ADGUARD - STOP ###"
 
+##### PLEX
+echo -e "### SERVICE.PLEX - START ###"
+if [[ $(yq eval '.services.plex.enabled // false' $CONFIG) == true ]] && [[ $(yq eval '.system.nfs.mounts.media' $CONFIG) == true ]]; then
+  if [[ -z "$(docker container list --filter 'name=plex' --quiet)" ]]; then
+    if [[ ! -d /root/.config/services/plex ]]; then
+      echo -e "PLEX DIRECTORY MISSING, CREATING..."
+      create_directory /root/.config/services/plex
+      echo -e ""
+    else
+      echo -e "PLEX DIRECTORY EXISTS, SKIPPING..."
+    fi
+
+    if [[ ! -f /root/.config/services/plex/compose.yml ]]; then
+      echo -e "PLEX COMPOSE MISSING, INSTALLING..."
+      curl -sL -o /root/.config/services/plex/compose.yml -H '$HEADER_NO_CACHE' $REPOSITORY_URL/services/plex/compose.yml
+      echo -e ""
+
+      ### SET PLEX COMPOSE OWNERSHIP
+      if [[ "$(stat -c '%U:%G' /root/.config/services/plex/compose.yml)" != "root:root" ]]; then
+        echo -e "PLEX COMPOSE OWNERSHIP IS WRONG, CHANGING..."
+        set_ownership /root/.config/services/plex/compose.yml root
+        echo -e ""
+      else
+        echo -e "PLEX COMPOSE OWNERSHIP IS CORRECT, SKIPPING..."
+        echo -e ""
+      fi
+
+      ### SET PLEX COMPOSE PERMISSIONS
+      if [[ "$(stat -c '%a' /root/.config/services/plex/compose.yml)" != 600 ]]; then
+        echo -e "PLEX COMPOSE PERMISSIONS ARE WRONG, CHANGING..."
+        set_permission /root/.config/services/plex/compose.yml 600
+        echo -e ""
+      else
+        echo -e "PLEX COMPOSE PERMISSIONS ARE CORRECT, SKIPPING..."
+        echo -e ""
+      fi
+    else
+      echo -e "PLEX COMPOSE EXISTS, SKIPPING..."
+    fi
+
+    echo -e "PLEX CONTAINER STARTING"
+    docker compose --file /root/.config/services/plex/compose.yml up --detach
+    echo -e ""
+  else
+    echo -e "PLEX CONTAINER EXISTS, SKIPPING..."
+  fi
+else
+  echo -e "SERVICES.PLEX.ENABLED IS FALSE, SKIPPING..."
+fi
+echo -e "### SERVICES.PLEX - STOP ###"
+
 ##### TRAEFIK
 echo -e "### SERVICES.TRAEFIK - START ###"
 if [[ $(yq eval '.services.traefik.enabled // false' $CONFIG) == true ]] && [[ $(yq eval '.system.docker.ingress // false' $CONFIG) == true ]]; then
@@ -485,3 +536,54 @@ else
   echo -e "SERVICES.TRAEFIK.ENABLED IS FALSE, SKIPPING..."
 fi
 echo -e "### SERVICES.TRAEFIK - STOP ###"
+
+##### WATCHTOWER
+echo -e "### SERVICE.WATCHTOWER - START ###"
+if [[ $(yq eval '.services.watchtower.enabled // false' $CONFIG) == true ]]; then
+  if [[ -z "$(docker container list --filter 'name=watchtower' --quiet)" ]]; then
+    if [[ ! -d /root/.config/services/watchtower ]]; then
+      echo -e "WATCHTOWER DIRECTORY MISSING, CREATING..."
+      create_directory /root/.config/services/watchtower
+      echo -e ""
+    else
+      echo -e "WATCHTOWER DIRECTORY EXISTS, SKIPPING..."
+    fi
+
+    if [[ ! -f /root/.config/services/watchtower/compose.yml ]]; then
+      echo -e "WATCHTOWER COMPOSE MISSING, INSTALLING..."
+      curl -sL -o /root/.config/services/watchtower/compose.yml -H '$HEADER_NO_CACHE' $REPOSITORY_URL/services/watchtower/compose.yml
+      echo -e ""
+
+      ### SET WATCHTOWER COMPOSE OWNERSHIP
+      if [[ "$(stat -c '%U:%G' /root/.config/services/watchtower/compose.yml)" != "root:root" ]]; then
+        echo -e "WATCHTOWER COMPOSE OWNERSHIP IS WRONG, CHANGING..."
+        set_ownership /root/.config/services/watchtower/compose.yml root
+        echo -e ""
+      else
+        echo -e "WATCHTOWER COMPOSE OWNERSHIP IS CORRECT, SKIPPING..."
+        echo -e ""
+      fi
+
+      ### SET WATCHTOWER COMPOSE PERMISSIONS
+      if [[ "$(stat -c '%a' /root/.config/services/watchtower/compose.yml)" != 600 ]]; then
+        echo -e "WATCHTOWER COMPOSE PERMISSIONS ARE WRONG, CHANGING..."
+        set_permission /root/.config/services/watchtower/compose.yml 600
+        echo -e ""
+      else
+        echo -e "WATCHTOWER COMPOSE PERMISSIONS ARE CORRECT, SKIPPING..."
+        echo -e ""
+      fi
+    else
+      echo -e "WATCHTOWER COMPOSE EXISTS, SKIPPING..."
+    fi
+
+    echo -e "WATCHTOWER CONTAINER STARTING"
+    docker compose --file /root/.config/services/watchtower/compose.yml up --detach
+    echo -e ""
+  else
+    echo -e "WATCHTOWER CONTAINER EXISTS, SKIPPING..."
+  fi
+else
+  echo -e "SERVICES.WATCHTOWER.ENABLED IS FALSE, SKIPPING..."
+fi
+echo -e "### SERVICES.WATCHTOWER - STOP ###"

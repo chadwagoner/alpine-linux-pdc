@@ -28,6 +28,8 @@ curl -sL -H 'Cache-Control: no-cache, no-store' https://raw.githubusercontent.co
 services:
   adguard:
     enabled: (true/false)             [default: false]
+  plex:
+    enabled: (true/false)             [default: false]
   traefik:
     enabled: (true/false)             [default: false]
     custom_config:
@@ -37,6 +39,8 @@ services:
       DOMAIN: (string)                [default: ""]
       EMAIL: (string)                 [default: ""]
       SUBDOMAIN: (string)             [default: ""]
+  watchtower:
+    enabled: (true/false)             [default: false]
 system:
   docker:
     enabled: (true/false)             [default: false]
