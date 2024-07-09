@@ -26,6 +26,8 @@ curl -sL -H 'Cache-Control: no-cache, no-store' https://raw.githubusercontent.co
 
 ```yaml
 services:
+  adguard:
+    enabled: (true/false)             [default: false]
   traefik:
     enabled: (true/false)             [default: false]
     custom_config:

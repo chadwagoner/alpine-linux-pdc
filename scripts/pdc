@@ -292,6 +292,57 @@ echo -e "### DOCKER MODULE - STOP ###"
 
 ### SERVICES
 
+##### ADGUARD
+echo -e "### SERVICE.ADGUARD - START ###"
+if [[ $(yq eval '.services.adguard.enabled // false' $CONFIG) == true ]]; then
+  if [[ -z "$(docker container list --filter 'name=adguard' --quiet)" ]]; then
+    if [[ ! -d /root/.config/services/adguard ]]; then
+      echo -e "ADGUARD DIRECTORY MISSING, CREATING..."
+      create_directory /root/.config/services/adguard
+      echo -e ""
+    else
+      echo -e "ADGUARD DIRECTORY EXISTS, SKIPPING..."
+    fi
+
+    if [[ ! -f /root/.config/services/adguard/compose.yml ]]; then
+      echo -e "ADGUARD COMPOSE MISSING, INSTALLING..."
+      curl -sL -o /root/.config/services/adguard/compose.yml -H '$HEADER_NO_CACHE' $REPOSITORY_URL/services/adguard/compose.yml
+      echo -e ""
+
+      ### SET ADGUARD COMPOSE OWNERSHIP
+      if [[ "$(stat -c '%U:%G' /root/.config/services/adguard/compose.yml)" != "root:root" ]]; then
+        echo -e "ADGUARD COMPOSE OWNERSHIP IS WRONG, CHANGING..."
+        set_ownership /root/.config/services/adguard/compose.yml root
+        echo -e ""
+      else
+        echo -e "ADGUARD COMPOSE OWNERSHIP IS CORRECT, SKIPPING..."
+        echo -e ""
+      fi
+
+      ### SET ADGUARD COMPOSE PERMISSIONS
+      if [[ "$(stat -c '%a' /root/.config/services/adguard/compose.yml)" != 600 ]]; then
+        echo -e "ADGUARD COMPOSE PERMISSIONS ARE WRONG, CHANGING..."
+        set_permission /root/.config/services/adguard/compose.yml 600
+        echo -e ""
+      else
+        echo -e "ADGUARD COMPOSE PERMISSIONS ARE CORRECT, SKIPPING..."
+        echo -e ""
+      fi
+    else
+      echo -e "ADGUARD COMPOSE EXISTS, SKIPPING..."
+    fi
+
+    echo -e "ADGUARD CONTAINER STARTING"
+    docker compose --file /root/.config/services/adguard/compose.yml up --detach
+    echo -e ""
+  else
+    echo -e "ADGUARD CONTAINER EXISTS, SKIPPING..."
+  fi
+else
+  echo -e "SERVICES.ADGUARD.ENABLED IS FALSE, SKIPPING..."
+fi
+echo -e "### SERVICES.ADGUARD - STOP ###"
+
 ##### TRAEFIK
 echo -e "### SERVICES.TRAEFIK - START ###"
 if [[ $(yq eval '.services.traefik.enabled // false' $CONFIG) == true ]] && [[ $(yq eval '.system.docker.ingress // false' $CONFIG) == true ]]; then

@@ -1,0 +1,13 @@
+services:
+  adguard:
+    image: adguard/adguardhome
+    container_name: adguard
+    restart: unless-stopped
+    network_mode: "host"
+    environment:
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /root/.config/services/adguard/conf:/opt/adguardhome/conf
+      - /root/.config/services/adguard/work:/opt/adguardhome/work
