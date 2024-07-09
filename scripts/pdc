@@ -425,7 +425,7 @@ if [[ $(yq eval '.services.traefik.enabled // false' $CONFIG) == true ]] && [[ $
     fi
 
     echo -e "TRAEFIK CONTAINER STARTING"
-    docker compose up --detach --file /root/.config/services/traefik/compose.yml
+    docker compose --file /root/.config/services/traefik/compose.yml up --detach
     echo -e ""
   else
     echo -e "TRAEFIK CONTAINER EXISTS, SKIPPING..."
