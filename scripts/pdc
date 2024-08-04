@@ -131,7 +131,7 @@ if [[ $(yq eval '.system.tailscale.enabled // false' $CONFIG) == true ]]; then
     apk add -U tailscale --quiet
 
     echo -e "ENABLE START"
-    rc-update add tailscale
+    rc-update add tailscale default
 
     echo -e "START SERVICE"
     rc-service tailscale start
