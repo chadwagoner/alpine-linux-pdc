@@ -80,7 +80,7 @@ if [[ $(yq eval '.system.nfs.enabled // false' $CONFIG) == true ]]; then
 
     ### ENABLE BOOT START
     echo -e "ENABLE BOOT START"
-    rc-update add nfsmount
+    rc-update add nfsmount boot
 
     ### START SERVICE
     echo -e "START SERVICE"
@@ -166,7 +166,7 @@ if [[ $(yq eval '.system.docker.enabled // false' $CONFIG) == true ]]; then
 
     ### ENABLE BOOT START
     echo -e "ENABLE BOOT START"
-    rc-update add docker boot
+    rc-update add docker default
 
     ### START SERVICE
     echo -e "START SERVICE"
