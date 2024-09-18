@@ -394,6 +394,57 @@ else
 fi
 echo -e "### SERVICES.PLEX - STOP ###"
 
+##### TAUTULLI
+echo -e "### SERVICE.TAUTULLI - START ###"
+if [[ $(yq eval '.services.tautulli.enabled // false' $CONFIG) == true ]]; then
+  if [[ -z "$(docker container list --filter 'name=tautulli' --quiet)" ]]; then
+    if [[ ! -d /root/.config/services/tautulli ]]; then
+      echo -e "TAUTULLI DIRECTORY MISSING, CREATING..."
+      create_directory /root/.config/services/tautulli
+      echo -e ""
+    else
+      echo -e "TAUTULLI DIRECTORY EXISTS, SKIPPING..."
+    fi
+
+    if [[ ! -f /root/.config/services/tautulli/compose.yml ]]; then
+      echo -e "TAUTULLI COMPOSE MISSING, INSTALLING..."
+      curl -sL -o /root/.config/services/tautulli/compose.yml -H '$HEADER_NO_CACHE' $REPOSITORY_URL/services/tautulli/compose.yml
+      echo -e ""
+
+      ### SET TAUTULLI COMPOSE OWNERSHIP
+      if [[ "$(stat -c '%U:%G' /root/.config/services/tautulli/compose.yml)" != "root:root" ]]; then
+        echo -e "TAUTULLI COMPOSE OWNERSHIP IS WRONG, CHANGING..."
+        set_ownership /root/.config/services/tautulli/compose.yml root
+        echo -e ""
+      else
+        echo -e "TAUTULLI COMPOSE OWNERSHIP IS CORRECT, SKIPPING..."
+        echo -e ""
+      fi
+
+      ### SET TAUTULLI COMPOSE PERMISSIONS
+      if [[ "$(stat -c '%a' /root/.config/services/tautulli/compose.yml)" != 600 ]]; then
+        echo -e "TAUTULLI COMPOSE PERMISSIONS ARE WRONG, CHANGING..."
+        set_permission /root/.config/services/tautulli/compose.yml 600
+        echo -e ""
+      else
+        echo -e "TAUTULLI COMPOSE PERMISSIONS ARE CORRECT, SKIPPING..."
+        echo -e ""
+      fi
+    else
+      echo -e "TAUTULLI COMPOSE EXISTS, SKIPPING..."
+    fi
+
+    echo -e "TAUTULLI CONTAINER STARTING"
+    docker compose --file /root/.config/services/tautulli/compose.yml up --detach
+    echo -e ""
+  else
+    echo -e "TAUTULLI CONTAINER EXISTS, SKIPPING..."
+  fi
+else
+  echo -e "SERVICES.TAUTULLI.ENABLED IS FALSE, SKIPPING..."
+fi
+echo -e "### SERVICES.TAUTULLI - STOP ###"
+
 ##### TRAEFIK
 echo -e "### SERVICES.TRAEFIK - START ###"
 if [[ $(yq eval '.services.traefik.enabled // false' $CONFIG) == true ]] && [[ $(yq eval '.system.docker.ingress // false' $CONFIG) == true ]]; then

@@ -30,6 +30,8 @@ services:
     enabled: (true/false)             [default: false]
   plex:
     enabled: (true/false)             [default: false]
+  tautulli:
+    enabled: (true/false)             [default: false]
   traefik:
     enabled: (true/false)             [default: false]
     custom_config:
