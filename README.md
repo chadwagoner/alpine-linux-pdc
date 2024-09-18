@@ -37,10 +37,8 @@ services:
     custom_config:
     required_env:
       ADMIN_CREDS: (string)           [default: ""]
-      DO_AUTH_TOKEN: (string)         [default: ""]
-      DOMAIN: (string)                [default: ""]
-      EMAIL: (string)                 [default: ""]
-      SUBDOMAIN: (string)             [default: ""]
+      TAILSCALE_MACHINE: (string)     [default: ""]
+      TAILSCALE_TAILNET: (string)     [default: ""]
   watchtower:
     enabled: (true/false)             [default: false]
 system:
@@ -61,7 +59,6 @@ system:
     enabled: (true/false)             [default: false]
     exit: (true/false)                [default: false]
     subnet: (true/false)              [default: false]
-    tailnet: (string)                 [default: ""]
   ufw:
     enabled: (true/false)             [default: false]
 ```

@@ -459,7 +459,7 @@ if [[ $(yq eval '.services.traefik.enabled // false' $CONFIG) == true ]] && [[ $
 
     if [[ ! -f /root/.config/services/traefik/compose.yml ]]; then
       echo -e "TRAEFIK COMPOSE MISSING, INSTALLING..."
-      curl -sL -o /root/.config/services/traefik/compose.yml -H '$HEADER_NO_CACHE' $REPOSITORY_URL/services/traefik/compose.digitalocean.yml
+      curl -sL -o /root/.config/services/traefik/compose.yml -H '$HEADER_NO_CACHE' $REPOSITORY_URL/services/traefik/compose.tailscale.yml
       echo -e ""
 
       ### SET TRAEFIK COMPOSE OWNERSHIP
@@ -517,33 +517,33 @@ if [[ $(yq eval '.services.traefik.enabled // false' $CONFIG) == true ]] && [[ $
       echo -e ".ENV EXISTS, SKIPPING..."
     fi
 
-    if [[ ! -f /root/.config/services/traefik/acme.json ]]; then
-      echo -e "ACME.JSON MISSING, INSTALLING..."
-      create_file /root/.config/services/traefik/acme.json
-      echo -e ""
+    # if [[ ! -f /root/.config/services/traefik/acme.json ]]; then
+    #   echo -e "ACME.JSON MISSING, INSTALLING..."
+    #   create_file /root/.config/services/traefik/acme.json
+    #   echo -e ""
 
-      ### SET ACME.JSON OWNERSHIP
-      if [[ "$(stat -c '%U:%G' /root/.config/services/traefik/acme.json)" != "root:root" ]]; then
-        echo -e "ACME.JSON OWNERSHIP IS WRONG, CHANGING..."
-        set_ownership /root/.config/services/traefik/acme.json root
-        echo -e ""
-      else
-        echo -e "ACME.JSON OWNERSHIP IS CORRECT, SKIPPING..."
-        echo -e ""
-      fi
+    #   ### SET ACME.JSON OWNERSHIP
+    #   if [[ "$(stat -c '%U:%G' /root/.config/services/traefik/acme.json)" != "root:root" ]]; then
+    #     echo -e "ACME.JSON OWNERSHIP IS WRONG, CHANGING..."
+    #     set_ownership /root/.config/services/traefik/acme.json root
+    #     echo -e ""
+    #   else
+    #     echo -e "ACME.JSON OWNERSHIP IS CORRECT, SKIPPING..."
+    #     echo -e ""
+    #   fi
 
-      ### SET ACME.JSON PERMISSIONS
-      if [[ "$(stat -c '%a' /root/.config/services/traefik/acme.json)" != 600 ]]; then
-        echo -e "ACME.JSON PERMISSIONS ARE WRONG, CHANGING..."
-        set_permission /root/.config/services/traefik/acme.json 600
-        echo -e ""
-      else
-        echo -e "ACME.JSON PERMISSIONS ARE CORRECT, SKIPPING..."
-        echo -e ""
-      fi
-    else
-      echo -e "ACME.JSON EXISTS, SKIPPING..."
-    fi
+    #   ### SET ACME.JSON PERMISSIONS
+    #   if [[ "$(stat -c '%a' /root/.config/services/traefik/acme.json)" != 600 ]]; then
+    #     echo -e "ACME.JSON PERMISSIONS ARE WRONG, CHANGING..."
+    #     set_permission /root/.config/services/traefik/acme.json 600
+    #     echo -e ""
+    #   else
+    #     echo -e "ACME.JSON PERMISSIONS ARE CORRECT, SKIPPING..."
+    #     echo -e ""
+    #   fi
+    # else
+    #   echo -e "ACME.JSON EXISTS, SKIPPING..."
+    # fi
 
     if [[ ! -f /root/.config/services/traefik/config.yml ]]; then
       echo -e "CONFIG.YML MISSING, INSTALLING..."
