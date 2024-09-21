@@ -42,6 +42,9 @@ services:
   watchtower:
     enabled: (true/false)             [default: false]
 system:
+  containers:
+    portainer:
+      enabled: (true/false)           [default: false]
   docker:
     enabled: (true/false)             [default: false]
     ingress: (true/false)             [default: false]

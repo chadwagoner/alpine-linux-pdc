@@ -263,26 +263,26 @@ if [[ $(yq eval '.system.docker.enabled // false' $CONFIG) == true ]]; then
   #   echo -e "DOCKER.INGRESS.TRAEFIK IS FALSE, SKIPPING..."
   # fi
 
-  # ### INSTALL PORTAINER
-  # if [[ $(yq eval '.system.docker.containers.portainer // false' $CONFIG) == true ]]; then
-  #   if [[ -z "$(docker container list --filter 'name=portainer' --quiet)" ]]; then
-  #     if [[ -z "$(docker volume list --filter 'name=portainer_data' --quiet)" ]]; then
-  #       ### CREATE PORTAINER_DATA VOLUME
-  #       echo -e "CREATING PORTAINER_DATA VOLUME"
-  #       docker volume create portainer_data
-  #     else
-  #       echo -e "PORTAINER_DATA VOLUME EXISTS, SKIPPING..."
-  #     fi
+  ### INSTALL PORTAINER
+  if [[ $(yq eval '.system.containers.portainer.enabled // false' $CONFIG) == true ]]; then
+    if [[ -z "$(docker container list --filter 'name=portainer' --quiet)" ]]; then
+      if [[ -z "$(docker volume list --filter 'name=portainer_data' --quiet)" ]]; then
+        ### CREATE PORTAINER_DATA VOLUME
+        echo -e "CREATING PORTAINER_DATA VOLUME"
+        docker volume create portainer_data
+      else
+        echo -e "PORTAINER_DATA VOLUME EXISTS, SKIPPING..."
+      fi
 
-  #     ### CREATE PORTAINER CONTAINER
-  #     echo -e "CREATING PORTAINER CONTAINER"
-  #     docker run -d -p 9443:9443 --name portainer --restart=always -v /etc/localtime:/etc/localtime:ro -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data -l com.centurylinklabs.watchtower.enable=true portainer/portainer-ce:latest
-  #   else
-  #     echo -e "PORTAINER CONTAINER EXISTS, SKIPPING..."
-  #   fi
-  # else
-  #   echo -e "DOCKER.CONTAINERS.PORTAINER IS FALSE, SKIPPING"
-  # fi
+      ### CREATE PORTAINER CONTAINER
+      echo -e "CREATING PORTAINER CONTAINER"
+      docker run -d -p 9443:9443 --name portainer --restart=always -v /etc/localtime:/etc/localtime:ro -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data -l com.centurylinklabs.watchtower.enable=true portainer/portainer-ce:latest
+    else
+      echo -e "PORTAINER CONTAINER EXISTS, SKIPPING..."
+    fi
+  else
+    echo -e "SYSTEM.CONTAINERS.PORTAINER IS FALSE, SKIPPING"
+  fi
 else
   echo -e "DOCKER.ENABLED IS FALSE, SKIPPING..."
 fi
@@ -290,351 +290,351 @@ echo -e "### DOCKER MODULE - STOP ###"
 
 ### UFW MODULE
 
-### SERVICES
+# ### SERVICES
 
-##### ADGUARD
-echo -e "### SERVICE.ADGUARD - START ###"
-if [[ $(yq eval '.services.adguard.enabled // false' $CONFIG) == true ]]; then
-  if [[ -z "$(docker container list --filter 'name=adguard' --quiet)" ]]; then
-    if [[ ! -d /root/.config/services/adguard ]]; then
-      echo -e "ADGUARD DIRECTORY MISSING, CREATING..."
-      create_directory /root/.config/services/adguard
-      echo -e ""
-    else
-      echo -e "ADGUARD DIRECTORY EXISTS, SKIPPING..."
-    fi
+# ##### ADGUARD
+# echo -e "### SERVICE.ADGUARD - START ###"
+# if [[ $(yq eval '.services.adguard.enabled // false' $CONFIG) == true ]]; then
+#   if [[ -z "$(docker container list --filter 'name=adguard' --quiet)" ]]; then
+#     if [[ ! -d /root/.config/services/adguard ]]; then
+#       echo -e "ADGUARD DIRECTORY MISSING, CREATING..."
+#       create_directory /root/.config/services/adguard
+#       echo -e ""
+#     else
+#       echo -e "ADGUARD DIRECTORY EXISTS, SKIPPING..."
+#     fi
 
-    if [[ ! -f /root/.config/services/adguard/compose.yml ]]; then
-      echo -e "ADGUARD COMPOSE MISSING, INSTALLING..."
-      curl -sL -o /root/.config/services/adguard/compose.yml -H '$HEADER_NO_CACHE' $REPOSITORY_URL/services/adguard/compose.yml
-      echo -e ""
+#     if [[ ! -f /root/.config/services/adguard/compose.yml ]]; then
+#       echo -e "ADGUARD COMPOSE MISSING, INSTALLING..."
+#       curl -sL -o /root/.config/services/adguard/compose.yml -H '$HEADER_NO_CACHE' $REPOSITORY_URL/services/adguard/compose.yml
+#       echo -e ""
 
-      ### SET ADGUARD COMPOSE OWNERSHIP
-      if [[ "$(stat -c '%U:%G' /root/.config/services/adguard/compose.yml)" != "root:root" ]]; then
-        echo -e "ADGUARD COMPOSE OWNERSHIP IS WRONG, CHANGING..."
-        set_ownership /root/.config/services/adguard/compose.yml root
-        echo -e ""
-      else
-        echo -e "ADGUARD COMPOSE OWNERSHIP IS CORRECT, SKIPPING..."
-        echo -e ""
-      fi
+#       ### SET ADGUARD COMPOSE OWNERSHIP
+#       if [[ "$(stat -c '%U:%G' /root/.config/services/adguard/compose.yml)" != "root:root" ]]; then
+#         echo -e "ADGUARD COMPOSE OWNERSHIP IS WRONG, CHANGING..."
+#         set_ownership /root/.config/services/adguard/compose.yml root
+#         echo -e ""
+#       else
+#         echo -e "ADGUARD COMPOSE OWNERSHIP IS CORRECT, SKIPPING..."
+#         echo -e ""
+#       fi
 
-      ### SET ADGUARD COMPOSE PERMISSIONS
-      if [[ "$(stat -c '%a' /root/.config/services/adguard/compose.yml)" != 600 ]]; then
-        echo -e "ADGUARD COMPOSE PERMISSIONS ARE WRONG, CHANGING..."
-        set_permission /root/.config/services/adguard/compose.yml 600
-        echo -e ""
-      else
-        echo -e "ADGUARD COMPOSE PERMISSIONS ARE CORRECT, SKIPPING..."
-        echo -e ""
-      fi
-    else
-      echo -e "ADGUARD COMPOSE EXISTS, SKIPPING..."
-    fi
+#       ### SET ADGUARD COMPOSE PERMISSIONS
+#       if [[ "$(stat -c '%a' /root/.config/services/adguard/compose.yml)" != 600 ]]; then
+#         echo -e "ADGUARD COMPOSE PERMISSIONS ARE WRONG, CHANGING..."
+#         set_permission /root/.config/services/adguard/compose.yml 600
+#         echo -e ""
+#       else
+#         echo -e "ADGUARD COMPOSE PERMISSIONS ARE CORRECT, SKIPPING..."
+#         echo -e ""
+#       fi
+#     else
+#       echo -e "ADGUARD COMPOSE EXISTS, SKIPPING..."
+#     fi
 
-    echo -e "ADGUARD CONTAINER STARTING"
-    docker compose --file /root/.config/services/adguard/compose.yml up --detach
-    echo -e ""
-  else
-    echo -e "ADGUARD CONTAINER EXISTS, SKIPPING..."
-  fi
-else
-  echo -e "SERVICES.ADGUARD.ENABLED IS FALSE, SKIPPING..."
-fi
-echo -e "### SERVICES.ADGUARD - STOP ###"
+#     echo -e "ADGUARD CONTAINER STARTING"
+#     docker compose --file /root/.config/services/adguard/compose.yml up --detach
+#     echo -e ""
+#   else
+#     echo -e "ADGUARD CONTAINER EXISTS, SKIPPING..."
+#   fi
+# else
+#   echo -e "SERVICES.ADGUARD.ENABLED IS FALSE, SKIPPING..."
+# fi
+# echo -e "### SERVICES.ADGUARD - STOP ###"
 
-##### PLEX
-echo -e "### SERVICE.PLEX - START ###"
-if [[ $(yq eval '.services.plex.enabled // false' $CONFIG) == true ]] && [[ $(yq eval '.system.nfs.mounts.media' $CONFIG) == true ]]; then
-  if [[ -z "$(docker container list --filter 'name=plex' --quiet)" ]]; then
-    if [[ ! -d /root/.config/services/plex ]]; then
-      echo -e "PLEX DIRECTORY MISSING, CREATING..."
-      create_directory /root/.config/services/plex
-      echo -e ""
-    else
-      echo -e "PLEX DIRECTORY EXISTS, SKIPPING..."
-    fi
+# ##### PLEX
+# echo -e "### SERVICE.PLEX - START ###"
+# if [[ $(yq eval '.services.plex.enabled // false' $CONFIG) == true ]] && [[ $(yq eval '.system.nfs.mounts.media' $CONFIG) == true ]]; then
+#   if [[ -z "$(docker container list --filter 'name=plex' --quiet)" ]]; then
+#     if [[ ! -d /root/.config/services/plex ]]; then
+#       echo -e "PLEX DIRECTORY MISSING, CREATING..."
+#       create_directory /root/.config/services/plex
+#       echo -e ""
+#     else
+#       echo -e "PLEX DIRECTORY EXISTS, SKIPPING..."
+#     fi
 
-    if [[ ! -f /root/.config/services/plex/compose.yml ]]; then
-      echo -e "PLEX COMPOSE MISSING, INSTALLING..."
-      curl -sL -o /root/.config/services/plex/compose.yml -H '$HEADER_NO_CACHE' $REPOSITORY_URL/services/plex/compose.yml
-      echo -e ""
+#     if [[ ! -f /root/.config/services/plex/compose.yml ]]; then
+#       echo -e "PLEX COMPOSE MISSING, INSTALLING..."
+#       curl -sL -o /root/.config/services/plex/compose.yml -H '$HEADER_NO_CACHE' $REPOSITORY_URL/services/plex/compose.yml
+#       echo -e ""
 
-      ### SET PLEX COMPOSE OWNERSHIP
-      if [[ "$(stat -c '%U:%G' /root/.config/services/plex/compose.yml)" != "root:root" ]]; then
-        echo -e "PLEX COMPOSE OWNERSHIP IS WRONG, CHANGING..."
-        set_ownership /root/.config/services/plex/compose.yml root
-        echo -e ""
-      else
-        echo -e "PLEX COMPOSE OWNERSHIP IS CORRECT, SKIPPING..."
-        echo -e ""
-      fi
+#       ### SET PLEX COMPOSE OWNERSHIP
+#       if [[ "$(stat -c '%U:%G' /root/.config/services/plex/compose.yml)" != "root:root" ]]; then
+#         echo -e "PLEX COMPOSE OWNERSHIP IS WRONG, CHANGING..."
+#         set_ownership /root/.config/services/plex/compose.yml root
+#         echo -e ""
+#       else
+#         echo -e "PLEX COMPOSE OWNERSHIP IS CORRECT, SKIPPING..."
+#         echo -e ""
+#       fi
 
-      ### SET PLEX COMPOSE PERMISSIONS
-      if [[ "$(stat -c '%a' /root/.config/services/plex/compose.yml)" != 600 ]]; then
-        echo -e "PLEX COMPOSE PERMISSIONS ARE WRONG, CHANGING..."
-        set_permission /root/.config/services/plex/compose.yml 600
-        echo -e ""
-      else
-        echo -e "PLEX COMPOSE PERMISSIONS ARE CORRECT, SKIPPING..."
-        echo -e ""
-      fi
-    else
-      echo -e "PLEX COMPOSE EXISTS, SKIPPING..."
-    fi
+#       ### SET PLEX COMPOSE PERMISSIONS
+#       if [[ "$(stat -c '%a' /root/.config/services/plex/compose.yml)" != 600 ]]; then
+#         echo -e "PLEX COMPOSE PERMISSIONS ARE WRONG, CHANGING..."
+#         set_permission /root/.config/services/plex/compose.yml 600
+#         echo -e ""
+#       else
+#         echo -e "PLEX COMPOSE PERMISSIONS ARE CORRECT, SKIPPING..."
+#         echo -e ""
+#       fi
+#     else
+#       echo -e "PLEX COMPOSE EXISTS, SKIPPING..."
+#     fi
 
-    echo -e "PLEX CONTAINER STARTING"
-    docker compose --file /root/.config/services/plex/compose.yml up --detach
-    echo -e ""
-  else
-    echo -e "PLEX CONTAINER EXISTS, SKIPPING..."
-  fi
-else
-  echo -e "SERVICES.PLEX.ENABLED IS FALSE, SKIPPING..."
-fi
-echo -e "### SERVICES.PLEX - STOP ###"
+#     echo -e "PLEX CONTAINER STARTING"
+#     docker compose --file /root/.config/services/plex/compose.yml up --detach
+#     echo -e ""
+#   else
+#     echo -e "PLEX CONTAINER EXISTS, SKIPPING..."
+#   fi
+# else
+#   echo -e "SERVICES.PLEX.ENABLED IS FALSE, SKIPPING..."
+# fi
+# echo -e "### SERVICES.PLEX - STOP ###"
 
-##### TAUTULLI
-echo -e "### SERVICE.TAUTULLI - START ###"
-if [[ $(yq eval '.services.tautulli.enabled // false' $CONFIG) == true ]]; then
-  if [[ -z "$(docker container list --filter 'name=tautulli' --quiet)" ]]; then
-    if [[ ! -d /root/.config/services/tautulli ]]; then
-      echo -e "TAUTULLI DIRECTORY MISSING, CREATING..."
-      create_directory /root/.config/services/tautulli
-      echo -e ""
-    else
-      echo -e "TAUTULLI DIRECTORY EXISTS, SKIPPING..."
-    fi
+# ##### TAUTULLI
+# echo -e "### SERVICE.TAUTULLI - START ###"
+# if [[ $(yq eval '.services.tautulli.enabled // false' $CONFIG) == true ]]; then
+#   if [[ -z "$(docker container list --filter 'name=tautulli' --quiet)" ]]; then
+#     if [[ ! -d /root/.config/services/tautulli ]]; then
+#       echo -e "TAUTULLI DIRECTORY MISSING, CREATING..."
+#       create_directory /root/.config/services/tautulli
+#       echo -e ""
+#     else
+#       echo -e "TAUTULLI DIRECTORY EXISTS, SKIPPING..."
+#     fi
 
-    if [[ ! -f /root/.config/services/tautulli/compose.yml ]]; then
-      echo -e "TAUTULLI COMPOSE MISSING, INSTALLING..."
-      curl -sL -o /root/.config/services/tautulli/compose.yml -H '$HEADER_NO_CACHE' $REPOSITORY_URL/services/tautulli/compose.yml
-      echo -e ""
+#     if [[ ! -f /root/.config/services/tautulli/compose.yml ]]; then
+#       echo -e "TAUTULLI COMPOSE MISSING, INSTALLING..."
+#       curl -sL -o /root/.config/services/tautulli/compose.yml -H '$HEADER_NO_CACHE' $REPOSITORY_URL/services/tautulli/compose.yml
+#       echo -e ""
 
-      ### SET TAUTULLI COMPOSE OWNERSHIP
-      if [[ "$(stat -c '%U:%G' /root/.config/services/tautulli/compose.yml)" != "root:root" ]]; then
-        echo -e "TAUTULLI COMPOSE OWNERSHIP IS WRONG, CHANGING..."
-        set_ownership /root/.config/services/tautulli/compose.yml root
-        echo -e ""
-      else
-        echo -e "TAUTULLI COMPOSE OWNERSHIP IS CORRECT, SKIPPING..."
-        echo -e ""
-      fi
+#       ### SET TAUTULLI COMPOSE OWNERSHIP
+#       if [[ "$(stat -c '%U:%G' /root/.config/services/tautulli/compose.yml)" != "root:root" ]]; then
+#         echo -e "TAUTULLI COMPOSE OWNERSHIP IS WRONG, CHANGING..."
+#         set_ownership /root/.config/services/tautulli/compose.yml root
+#         echo -e ""
+#       else
+#         echo -e "TAUTULLI COMPOSE OWNERSHIP IS CORRECT, SKIPPING..."
+#         echo -e ""
+#       fi
 
-      ### SET TAUTULLI COMPOSE PERMISSIONS
-      if [[ "$(stat -c '%a' /root/.config/services/tautulli/compose.yml)" != 600 ]]; then
-        echo -e "TAUTULLI COMPOSE PERMISSIONS ARE WRONG, CHANGING..."
-        set_permission /root/.config/services/tautulli/compose.yml 600
-        echo -e ""
-      else
-        echo -e "TAUTULLI COMPOSE PERMISSIONS ARE CORRECT, SKIPPING..."
-        echo -e ""
-      fi
-    else
-      echo -e "TAUTULLI COMPOSE EXISTS, SKIPPING..."
-    fi
+#       ### SET TAUTULLI COMPOSE PERMISSIONS
+#       if [[ "$(stat -c '%a' /root/.config/services/tautulli/compose.yml)" != 600 ]]; then
+#         echo -e "TAUTULLI COMPOSE PERMISSIONS ARE WRONG, CHANGING..."
+#         set_permission /root/.config/services/tautulli/compose.yml 600
+#         echo -e ""
+#       else
+#         echo -e "TAUTULLI COMPOSE PERMISSIONS ARE CORRECT, SKIPPING..."
+#         echo -e ""
+#       fi
+#     else
+#       echo -e "TAUTULLI COMPOSE EXISTS, SKIPPING..."
+#     fi
 
-    echo -e "TAUTULLI CONTAINER STARTING"
-    docker compose --file /root/.config/services/tautulli/compose.yml up --detach
-    echo -e ""
-  else
-    echo -e "TAUTULLI CONTAINER EXISTS, SKIPPING..."
-  fi
-else
-  echo -e "SERVICES.TAUTULLI.ENABLED IS FALSE, SKIPPING..."
-fi
-echo -e "### SERVICES.TAUTULLI - STOP ###"
+#     echo -e "TAUTULLI CONTAINER STARTING"
+#     docker compose --file /root/.config/services/tautulli/compose.yml up --detach
+#     echo -e ""
+#   else
+#     echo -e "TAUTULLI CONTAINER EXISTS, SKIPPING..."
+#   fi
+# else
+#   echo -e "SERVICES.TAUTULLI.ENABLED IS FALSE, SKIPPING..."
+# fi
+# echo -e "### SERVICES.TAUTULLI - STOP ###"
 
-##### TRAEFIK
-echo -e "### SERVICES.TRAEFIK - START ###"
-if [[ $(yq eval '.services.traefik.enabled // false' $CONFIG) == true ]] && [[ $(yq eval '.system.docker.ingress // false' $CONFIG) == true ]]; then
-  if [[ -z "$(docker container list --filter 'name=traefik' --quiet)" ]]; then
-    if [[ ! -d /root/.config/services/traefik ]]; then
-      echo -e "TRAEFIK DIRECTORY MISSING, CREATING..."
-      create_directory /root/.config/services/traefik
-      echo -e ""
-    else
-      echo -e "TRAEFIK DIRECTORY EXISTS, SKIPPING..."
-    fi
+# ##### TRAEFIK
+# echo -e "### SERVICES.TRAEFIK - START ###"
+# if [[ $(yq eval '.services.traefik.enabled // false' $CONFIG) == true ]] && [[ $(yq eval '.system.docker.ingress // false' $CONFIG) == true ]]; then
+#   if [[ -z "$(docker container list --filter 'name=traefik' --quiet)" ]]; then
+#     if [[ ! -d /root/.config/services/traefik ]]; then
+#       echo -e "TRAEFIK DIRECTORY MISSING, CREATING..."
+#       create_directory /root/.config/services/traefik
+#       echo -e ""
+#     else
+#       echo -e "TRAEFIK DIRECTORY EXISTS, SKIPPING..."
+#     fi
 
-    if [[ ! -f /root/.config/services/traefik/compose.yml ]]; then
-      echo -e "TRAEFIK COMPOSE MISSING, INSTALLING..."
-      curl -sL -o /root/.config/services/traefik/compose.yml -H '$HEADER_NO_CACHE' $REPOSITORY_URL/services/traefik/compose.tailscale.yml
-      echo -e ""
+#     if [[ ! -f /root/.config/services/traefik/compose.yml ]]; then
+#       echo -e "TRAEFIK COMPOSE MISSING, INSTALLING..."
+#       curl -sL -o /root/.config/services/traefik/compose.yml -H '$HEADER_NO_CACHE' $REPOSITORY_URL/services/traefik/compose.tailscale.yml
+#       echo -e ""
 
-      ### SET TRAEFIK COMPOSE OWNERSHIP
-      if [[ "$(stat -c '%U:%G' /root/.config/services/traefik/compose.yml)" != "root:root" ]]; then
-        echo -e "TRAEFIK COMPOSE OWNERSHIP IS WRONG, CHANGING..."
-        set_ownership /root/.config/services/traefik/compose.yml root
-        echo -e ""
-      else
-        echo -e "TRAEFIK COMPOSE OWNERSHIP IS CORRECT, SKIPPING..."
-        echo -e ""
-      fi
+#       ### SET TRAEFIK COMPOSE OWNERSHIP
+#       if [[ "$(stat -c '%U:%G' /root/.config/services/traefik/compose.yml)" != "root:root" ]]; then
+#         echo -e "TRAEFIK COMPOSE OWNERSHIP IS WRONG, CHANGING..."
+#         set_ownership /root/.config/services/traefik/compose.yml root
+#         echo -e ""
+#       else
+#         echo -e "TRAEFIK COMPOSE OWNERSHIP IS CORRECT, SKIPPING..."
+#         echo -e ""
+#       fi
 
-      ### SET TRAEFIK COMPOSE PERMISSIONS
-      if [[ "$(stat -c '%a' /root/.config/services/traefik/compose.yml)" != 700 ]]; then
-        echo -e "TRAEFIK COMPOSE PERMISSIONS ARE WRONG, CHANGING..."
-        set_permission /root/.config/services/traefik/compose.yml 700
-        echo -e ""
-      else
-        echo -e "TRAEFIK COMPOSE PERMISSIONS ARE CORRECT, SKIPPING..."
-        echo -e ""
-      fi
-    else
-      echo -e "TRAEFIK COMPOSE EXISTS, SKIPPING..."
-    fi
+#       ### SET TRAEFIK COMPOSE PERMISSIONS
+#       if [[ "$(stat -c '%a' /root/.config/services/traefik/compose.yml)" != 700 ]]; then
+#         echo -e "TRAEFIK COMPOSE PERMISSIONS ARE WRONG, CHANGING..."
+#         set_permission /root/.config/services/traefik/compose.yml 700
+#         echo -e ""
+#       else
+#         echo -e "TRAEFIK COMPOSE PERMISSIONS ARE CORRECT, SKIPPING..."
+#         echo -e ""
+#       fi
+#     else
+#       echo -e "TRAEFIK COMPOSE EXISTS, SKIPPING..."
+#     fi
 
-    if [[ ! -f /root/.config/services/traefik/.env ]]; then
-      echo -e ".ENV MISSING, INSTALLING..."
-      create_file /root/.config/services/traefik/.env
-      echo -e ""
+#     if [[ ! -f /root/.config/services/traefik/.env ]]; then
+#       echo -e ".ENV MISSING, INSTALLING..."
+#       create_file /root/.config/services/traefik/.env
+#       echo -e ""
 
-      ### SET .ENV OWNERSHIP
-      if [[ "$(stat -c '%U:%G' /root/.config/services/traefik/.env)" != "root:root" ]]; then
-        echo -e ".ENV OWNERSHIP IS WRONG, CHANGING..."
-        set_ownership /root/.config/services/traefik/.env root
-        echo -e ""
-      else
-        echo -e ".ENV OWNERSHIP IS CORRECT, SKIPPING..."
-        echo -e ""
-      fi
+#       ### SET .ENV OWNERSHIP
+#       if [[ "$(stat -c '%U:%G' /root/.config/services/traefik/.env)" != "root:root" ]]; then
+#         echo -e ".ENV OWNERSHIP IS WRONG, CHANGING..."
+#         set_ownership /root/.config/services/traefik/.env root
+#         echo -e ""
+#       else
+#         echo -e ".ENV OWNERSHIP IS CORRECT, SKIPPING..."
+#         echo -e ""
+#       fi
 
-      ### SET .ENV PERMISSIONS
-      if [[ "$(stat -c '%a' /root/.config/services/traefik/.env)" != 600 ]]; then
-        echo -e ".ENV PERMISSIONS ARE WRONG, CHANGING..."
-        set_permission /root/.config/services/traefik/.env 600
-        echo -e ""
-      else
-        echo -e ".ENV PERMISSIONS ARE CORRECT, SKIPPING..."
-        echo -e ""
-      fi
+#       ### SET .ENV PERMISSIONS
+#       if [[ "$(stat -c '%a' /root/.config/services/traefik/.env)" != 600 ]]; then
+#         echo -e ".ENV PERMISSIONS ARE WRONG, CHANGING..."
+#         set_permission /root/.config/services/traefik/.env 600
+#         echo -e ""
+#       else
+#         echo -e ".ENV PERMISSIONS ARE CORRECT, SKIPPING..."
+#         echo -e ""
+#       fi
 
-      echo -e "POPULATING .ENV"
-      yq --output-format props eval '.services.traefik.required_env' $CONFIG > /root/.config/services/traefik/.env
-      echo -e ""
-    else
-      echo -e ".ENV EXISTS, SKIPPING..."
-    fi
+#       echo -e "POPULATING .ENV"
+#       yq --output-format props eval '.services.traefik.required_env' $CONFIG > /root/.config/services/traefik/.env
+#       echo -e ""
+#     else
+#       echo -e ".ENV EXISTS, SKIPPING..."
+#     fi
 
-    # if [[ ! -f /root/.config/services/traefik/acme.json ]]; then
-    #   echo -e "ACME.JSON MISSING, INSTALLING..."
-    #   create_file /root/.config/services/traefik/acme.json
-    #   echo -e ""
+#     # if [[ ! -f /root/.config/services/traefik/acme.json ]]; then
+#     #   echo -e "ACME.JSON MISSING, INSTALLING..."
+#     #   create_file /root/.config/services/traefik/acme.json
+#     #   echo -e ""
 
-    #   ### SET ACME.JSON OWNERSHIP
-    #   if [[ "$(stat -c '%U:%G' /root/.config/services/traefik/acme.json)" != "root:root" ]]; then
-    #     echo -e "ACME.JSON OWNERSHIP IS WRONG, CHANGING..."
-    #     set_ownership /root/.config/services/traefik/acme.json root
-    #     echo -e ""
-    #   else
-    #     echo -e "ACME.JSON OWNERSHIP IS CORRECT, SKIPPING..."
-    #     echo -e ""
-    #   fi
+#     #   ### SET ACME.JSON OWNERSHIP
+#     #   if [[ "$(stat -c '%U:%G' /root/.config/services/traefik/acme.json)" != "root:root" ]]; then
+#     #     echo -e "ACME.JSON OWNERSHIP IS WRONG, CHANGING..."
+#     #     set_ownership /root/.config/services/traefik/acme.json root
+#     #     echo -e ""
+#     #   else
+#     #     echo -e "ACME.JSON OWNERSHIP IS CORRECT, SKIPPING..."
+#     #     echo -e ""
+#     #   fi
 
-    #   ### SET ACME.JSON PERMISSIONS
-    #   if [[ "$(stat -c '%a' /root/.config/services/traefik/acme.json)" != 600 ]]; then
-    #     echo -e "ACME.JSON PERMISSIONS ARE WRONG, CHANGING..."
-    #     set_permission /root/.config/services/traefik/acme.json 600
-    #     echo -e ""
-    #   else
-    #     echo -e "ACME.JSON PERMISSIONS ARE CORRECT, SKIPPING..."
-    #     echo -e ""
-    #   fi
-    # else
-    #   echo -e "ACME.JSON EXISTS, SKIPPING..."
-    # fi
+#     #   ### SET ACME.JSON PERMISSIONS
+#     #   if [[ "$(stat -c '%a' /root/.config/services/traefik/acme.json)" != 600 ]]; then
+#     #     echo -e "ACME.JSON PERMISSIONS ARE WRONG, CHANGING..."
+#     #     set_permission /root/.config/services/traefik/acme.json 600
+#     #     echo -e ""
+#     #   else
+#     #     echo -e "ACME.JSON PERMISSIONS ARE CORRECT, SKIPPING..."
+#     #     echo -e ""
+#     #   fi
+#     # else
+#     #   echo -e "ACME.JSON EXISTS, SKIPPING..."
+#     # fi
 
-    if [[ ! -f /root/.config/services/traefik/config.yml ]]; then
-      echo -e "CONFIG.YML MISSING, INSTALLING..."
-      create_file /root/.config/services/traefik/config.yml
-      echo -e ""
+#     if [[ ! -f /root/.config/services/traefik/config.yml ]]; then
+#       echo -e "CONFIG.YML MISSING, INSTALLING..."
+#       create_file /root/.config/services/traefik/config.yml
+#       echo -e ""
 
-      ### SET CONFIG.YML OWNERSHIP
-      if [[ "$(stat -c '%U:%G' /root/.config/services/traefik/config.yml)" != "root:root" ]]; then
-        echo -e "CONFIG.YML OWNERSHIP IS WRONG, CHANGING..."
-        set_ownership /root/.config/services/traefik/config.yml root
-        echo -e ""
-      else
-        echo -e "CONFIG.YML OWNERSHIP IS CORRECT, SKIPPING..."
-        echo -e ""
-      fi
+#       ### SET CONFIG.YML OWNERSHIP
+#       if [[ "$(stat -c '%U:%G' /root/.config/services/traefik/config.yml)" != "root:root" ]]; then
+#         echo -e "CONFIG.YML OWNERSHIP IS WRONG, CHANGING..."
+#         set_ownership /root/.config/services/traefik/config.yml root
+#         echo -e ""
+#       else
+#         echo -e "CONFIG.YML OWNERSHIP IS CORRECT, SKIPPING..."
+#         echo -e ""
+#       fi
 
-      ### SET CONFIG.YML PERMISSIONS
-      if [[ "$(stat -c '%a' /root/.config/services/traefik/config.yml)" != 700 ]]; then
-        echo -e "CONFIG.YML PERMISSIONS ARE WRONG, CHANGING..."
-        set_permission /root/.config/services/traefik/config.yml 700
-        echo -e ""
-      else
-        echo -e "CONFIG.YML PERMISSIONS ARE CORRECT, SKIPPING..."
-        echo -e ""
-      fi
+#       ### SET CONFIG.YML PERMISSIONS
+#       if [[ "$(stat -c '%a' /root/.config/services/traefik/config.yml)" != 700 ]]; then
+#         echo -e "CONFIG.YML PERMISSIONS ARE WRONG, CHANGING..."
+#         set_permission /root/.config/services/traefik/config.yml 700
+#         echo -e ""
+#       else
+#         echo -e "CONFIG.YML PERMISSIONS ARE CORRECT, SKIPPING..."
+#         echo -e ""
+#       fi
 
-      echo -e "POPULATING CONFIG.YML"
-      yq eval '.services.traefik.custom_config' $CONFIG > /root/.config/services/traefik/config.yml
-      echo -e ""
-    else
-      echo -e "CONFIG.YML EXISTS, SKIPPING..."
-    fi
+#       echo -e "POPULATING CONFIG.YML"
+#       yq eval '.services.traefik.custom_config' $CONFIG > /root/.config/services/traefik/config.yml
+#       echo -e ""
+#     else
+#       echo -e "CONFIG.YML EXISTS, SKIPPING..."
+#     fi
 
-    echo -e "TRAEFIK CONTAINER STARTING"
-    docker compose --file /root/.config/services/traefik/compose.yml up --detach
-    echo -e ""
-  else
-    echo -e "TRAEFIK CONTAINER EXISTS, SKIPPING..."
-  fi
-else
-  echo -e "SERVICES.TRAEFIK.ENABLED IS FALSE, SKIPPING..."
-fi
-echo -e "### SERVICES.TRAEFIK - STOP ###"
+#     echo -e "TRAEFIK CONTAINER STARTING"
+#     docker compose --file /root/.config/services/traefik/compose.yml up --detach
+#     echo -e ""
+#   else
+#     echo -e "TRAEFIK CONTAINER EXISTS, SKIPPING..."
+#   fi
+# else
+#   echo -e "SERVICES.TRAEFIK.ENABLED IS FALSE, SKIPPING..."
+# fi
+# echo -e "### SERVICES.TRAEFIK - STOP ###"
 
-##### WATCHTOWER
-echo -e "### SERVICE.WATCHTOWER - START ###"
-if [[ $(yq eval '.services.watchtower.enabled // false' $CONFIG) == true ]]; then
-  if [[ -z "$(docker container list --filter 'name=watchtower' --quiet)" ]]; then
-    if [[ ! -d /root/.config/services/watchtower ]]; then
-      echo -e "WATCHTOWER DIRECTORY MISSING, CREATING..."
-      create_directory /root/.config/services/watchtower
-      echo -e ""
-    else
-      echo -e "WATCHTOWER DIRECTORY EXISTS, SKIPPING..."
-    fi
+# ##### WATCHTOWER
+# echo -e "### SERVICE.WATCHTOWER - START ###"
+# if [[ $(yq eval '.services.watchtower.enabled // false' $CONFIG) == true ]]; then
+#   if [[ -z "$(docker container list --filter 'name=watchtower' --quiet)" ]]; then
+#     if [[ ! -d /root/.config/services/watchtower ]]; then
+#       echo -e "WATCHTOWER DIRECTORY MISSING, CREATING..."
+#       create_directory /root/.config/services/watchtower
+#       echo -e ""
+#     else
+#       echo -e "WATCHTOWER DIRECTORY EXISTS, SKIPPING..."
+#     fi
 
-    if [[ ! -f /root/.config/services/watchtower/compose.yml ]]; then
-      echo -e "WATCHTOWER COMPOSE MISSING, INSTALLING..."
-      curl -sL -o /root/.config/services/watchtower/compose.yml -H '$HEADER_NO_CACHE' $REPOSITORY_URL/services/watchtower/compose.yml
-      echo -e ""
+#     if [[ ! -f /root/.config/services/watchtower/compose.yml ]]; then
+#       echo -e "WATCHTOWER COMPOSE MISSING, INSTALLING..."
+#       curl -sL -o /root/.config/services/watchtower/compose.yml -H '$HEADER_NO_CACHE' $REPOSITORY_URL/services/watchtower/compose.yml
+#       echo -e ""
 
-      ### SET WATCHTOWER COMPOSE OWNERSHIP
-      if [[ "$(stat -c '%U:%G' /root/.config/services/watchtower/compose.yml)" != "root:root" ]]; then
-        echo -e "WATCHTOWER COMPOSE OWNERSHIP IS WRONG, CHANGING..."
-        set_ownership /root/.config/services/watchtower/compose.yml root
-        echo -e ""
-      else
-        echo -e "WATCHTOWER COMPOSE OWNERSHIP IS CORRECT, SKIPPING..."
-        echo -e ""
-      fi
+#       ### SET WATCHTOWER COMPOSE OWNERSHIP
+#       if [[ "$(stat -c '%U:%G' /root/.config/services/watchtower/compose.yml)" != "root:root" ]]; then
+#         echo -e "WATCHTOWER COMPOSE OWNERSHIP IS WRONG, CHANGING..."
+#         set_ownership /root/.config/services/watchtower/compose.yml root
+#         echo -e ""
+#       else
+#         echo -e "WATCHTOWER COMPOSE OWNERSHIP IS CORRECT, SKIPPING..."
+#         echo -e ""
+#       fi
 
-      ### SET WATCHTOWER COMPOSE PERMISSIONS
-      if [[ "$(stat -c '%a' /root/.config/services/watchtower/compose.yml)" != 600 ]]; then
-        echo -e "WATCHTOWER COMPOSE PERMISSIONS ARE WRONG, CHANGING..."
-        set_permission /root/.config/services/watchtower/compose.yml 600
-        echo -e ""
-      else
-        echo -e "WATCHTOWER COMPOSE PERMISSIONS ARE CORRECT, SKIPPING..."
-        echo -e ""
-      fi
-    else
-      echo -e "WATCHTOWER COMPOSE EXISTS, SKIPPING..."
-    fi
+#       ### SET WATCHTOWER COMPOSE PERMISSIONS
+#       if [[ "$(stat -c '%a' /root/.config/services/watchtower/compose.yml)" != 600 ]]; then
+#         echo -e "WATCHTOWER COMPOSE PERMISSIONS ARE WRONG, CHANGING..."
+#         set_permission /root/.config/services/watchtower/compose.yml 600
+#         echo -e ""
+#       else
+#         echo -e "WATCHTOWER COMPOSE PERMISSIONS ARE CORRECT, SKIPPING..."
+#         echo -e ""
+#       fi
+#     else
+#       echo -e "WATCHTOWER COMPOSE EXISTS, SKIPPING..."
+#     fi
 
-    echo -e "WATCHTOWER CONTAINER STARTING"
-    docker compose --file /root/.config/services/watchtower/compose.yml up --detach
-    echo -e ""
-  else
-    echo -e "WATCHTOWER CONTAINER EXISTS, SKIPPING..."
-  fi
-else
-  echo -e "SERVICES.WATCHTOWER.ENABLED IS FALSE, SKIPPING..."
-fi
-echo -e "### SERVICES.WATCHTOWER - STOP ###"
+#     echo -e "WATCHTOWER CONTAINER STARTING"
+#     docker compose --file /root/.config/services/watchtower/compose.yml up --detach
+#     echo -e ""
+#   else
+#     echo -e "WATCHTOWER CONTAINER EXISTS, SKIPPING..."
+#   fi
+# else
+#   echo -e "SERVICES.WATCHTOWER.ENABLED IS FALSE, SKIPPING..."
+# fi
+# echo -e "### SERVICES.WATCHTOWER - STOP ###"
