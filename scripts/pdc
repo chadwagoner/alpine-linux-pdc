@@ -50,6 +50,11 @@ if [[ $LOCAL_APK_REPOSITORIES != $REMOTE_APK_REPOSITORIES ]]; then
     echo -e "APK REPOSITORIES FILE PERMISSIONS ARE CORRECT, SKIPPING..."
     echo -e ""
   fi
+
+  ### REFRESH APK CACHE
+  echo -e "UPDATING APK CACHE..."
+  apk update
+  echo -e ""
 else
   echo -e "APK REPOSITORIES FILE LATEST, SKIPPING..."
   echo -e ""
